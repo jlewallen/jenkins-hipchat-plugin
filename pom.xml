@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.319</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>org.jvnet.hudson.plugins</groupId>
+  <artifactId>hipchat</artifactId>
+  <packaging>hpi</packaging>
+  <version>2.3.1-JGP</version>
+  <name>Hudson HipChat Plugin</name>
+  <description>A Build status publisher that notifies channels on a HipChat server</description>
+  <url></url>
+  <licenses>
+  	<license><name>MIT license</name><comments>All source code is under the MIT license.</comments></license>
+  </licenses>
+  <dependencies>
+    <dependency>
+      <groupId>org.jvnet.hudson.main</groupId>
+      <artifactId>maven-plugin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1-rc1</version>
+    </dependency>
+      <dependency>
+        <groupId>org.jvnet.hudson</groupId>
+        <artifactId>htmlunit</artifactId>
+        <version>2.2-hudson-10</version>
+      </dependency>
+  </dependencies>
+  <developers>
+    <developer>
+      <id>jenslukowski</id>
+      <name>Jens Lukowski</name>
+      <email>jens.lukowski@softwareschneiderei.de</email>
+      <organization>Softwareschneiderei GmbH</organization>
+      <organizationUrl>http://www.softwareschneiderei.de</organizationUrl>
+    </developer>
+    <developer>
+      <id>thickpaddy</id>
+      <name>Mark Woods</name>
+      <email>mark dot woods at jgp</email>
+      <organization>Jobsgopublic</organization>
+      <organizationUrl>http://www.jgp.co.uk</organizationUrl>
+    </developer>
+    <developer>
+      <id>jkrall</id>
+      <name>Joshua Krall</name>
+    </developer>
+    <developer>
+      <id>bgreenlee</id>
+      <name>Brad Greenlee</name>
+    </developer>
+  </developers>
+</project>

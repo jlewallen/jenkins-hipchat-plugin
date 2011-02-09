@@ -1,0 +1,9 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <!--
+    This jelly script is used for per-project configuration.
+    See global.jelly for a general discussion about jelly script.
+  -->
+    <f:entry title="Project Room (if different from ${descriptor.getRoom()})"  help="${rootURL}/plugin/hipchat/help-projectConfig-room.html">
+      <f:textbox name="roomId" value="${instance.getConfiguredRoomId()}"/>
+    </f:entry>
+</j:jelly>
