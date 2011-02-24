@@ -3,7 +3,7 @@
     This jelly script is used for per-project configuration.
     See global.jelly for a general discussion about jelly script.
   -->
-    <f:entry title="Project Room (if different from ${descriptor.getRoom()})"  help="${rootURL}/plugin/hipchat/help-projectConfig-room.html">
-      <f:textbox name="roomId" value="${instance.getConfiguredRoomId()}"/>
+    <f:entry title="Project Room (if different from ${descriptor.getRoom()})"  help="${rootURL}/plugin/hipchat/help-projectConfig-hipChatRoom.html">
+      <f:textbox name="hipChatProjectRoom" value="${instance.getProjectSpecificRoomId()}"/>
     </f:entry>
 </j:jelly>

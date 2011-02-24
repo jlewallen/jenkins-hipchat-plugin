@@ -1,4 +1,4 @@
-package hudson.plugins.hipchat;
+package jenkins.plugins.hipchat;
 
 import hudson.Plugin;
 
