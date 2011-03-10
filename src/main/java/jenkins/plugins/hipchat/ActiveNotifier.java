@@ -87,6 +87,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
    String getBuildStatusMessage(AbstractBuild r) {
       MessageBuilder message = new MessageBuilder(notifier, r);
       message.appendStatusMessage();
+      message.appendDuration();
       return message.appendOpenLink().toString();
    }
 
@@ -141,6 +142,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
       public MessageBuilder appendOpenLink() {
          String url = notifier.getJenkinsUrl() + build.getUrl();
          message.append(" (<a href='").append(url).append("'>Open</a>)");
+         return this;
+      }
+
+      public MessageBuilder appendDuration() {
+         message.append(" after ");
+         message.append(build.getDurationString());
          return this;
       }
 
