@@ -32,19 +32,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
    public void deleted(AbstractBuild r) {}
 
    public void started(AbstractBuild r) {
-      String changes = getChanges(r);
-      CauseAction cause = r.getAction(CauseAction.class);
-      if(changes != null) {
-         this.hipChat.publish(changes);
-      }
-      else if(cause != null) {
-         MessageBuilder message = new MessageBuilder(notifier, r);
-         message.append(cause.getShortDescription());
-         this.hipChat.publish(message.appendOpenLink().toString());
-      }
-      else {
-         this.hipChat.publish(getBuildStatusMessage(r));
-      }
+      
    }
 
    public void finalized(AbstractBuild r) {}
