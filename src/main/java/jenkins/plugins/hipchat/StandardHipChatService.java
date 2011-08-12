@@ -24,7 +24,11 @@ public class StandardHipChatService implements HipChatService {
    }
 
    public void publish(String message) {
-      logger.info("Posting: " + from + " to " + roomId + ": " + message);
+      publish(message, MessageColor.YELLOW);
+   }
+
+   public void publish(String message, MessageColor color) {
+      logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
 
       HttpClient client = new HttpClient();
       String url = "https://api.hipchat.com/v1/rooms/message?auth_token=" + token;
@@ -33,6 +37,7 @@ public class StandardHipChatService implements HipChatService {
          post.addParameter("from", from);
          post.addParameter("room_id", roomId);
          post.addParameter("message", message);
+         post.addParameter("color", color.toString().toLowerCase());
          client.executeMethod(post);
       }
       catch(HttpException e) {

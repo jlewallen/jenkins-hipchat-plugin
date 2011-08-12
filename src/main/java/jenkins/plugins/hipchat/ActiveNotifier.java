@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import jenkins.plugins.hipchat.HipChatService.MessageColor;
+
 import org.apache.commons.lang.StringUtils;
 
 @SuppressWarnings("rawtypes")
@@ -50,7 +52,16 @@ public class ActiveNotifier implements FineGrainedNotifier {
    public void finalized(AbstractBuild r) {}
 
    public void completed(AbstractBuild r) {
-      this.hipChat.publish(getBuildStatusMessage(r));
+      String message = getBuildStatusMessage(r);
+      MessageColor color = getBuildColor(r.getResult());
+      this.hipChat.publish(message, color);
+   }
+
+   public MessageColor getBuildColor(Result result) {
+      if(result == Result.SUCCESS) return MessageColor.GREEN;
+      if(result == Result.FAILURE) return MessageColor.RED;
+      if(result == Result.UNSTABLE) return MessageColor.RED;
+      return HipChatService.MessageColor.YELLOW;
    }
 
    String getChanges(AbstractBuild r) {
