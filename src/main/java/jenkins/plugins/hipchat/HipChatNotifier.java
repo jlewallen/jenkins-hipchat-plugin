@@ -74,6 +74,6 @@ public class HipChatNotifier extends Notifier {
    }
 
    public HipChatService newHipChatService() {
-      return new StandardHipChatService(getAuthToken(), getRoomId(), "Hudson");
+      return new StandardHipChatService(getAuthToken(), getRoomId(), "Jenkins");
    }
 }
