@@ -50,7 +50,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
    public void finalized(AbstractBuild r) {}
 
    public void completed(AbstractBuild r) {
-      this.hipChat.publish(getBuildStatusMessage(r));
+      this.hipChat.publishWithColor(getBuildStatusMessage(r), getBuildColor(r));
    }
 
    String getChanges(AbstractBuild r) {
@@ -82,6 +82,19 @@ public class ActiveNotifier implements FineGrainedNotifier {
       message.append(files.size());
       message.append(" file(s) changed)");
       return message.appendOpenLink().toString();
+   }
+
+   static String getBuildColor(AbstractBuild r) {
+      Result result = r.getResult();
+      if(result == Result.SUCCESS) {
+         return "green";
+      }
+      else if(result == Result.FAILURE) {
+         return "red";
+      }
+      else {
+         return "yellow";
+      }
    }
 
    String getBuildStatusMessage(AbstractBuild r) {
