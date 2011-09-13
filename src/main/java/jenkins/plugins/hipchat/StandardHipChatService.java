@@ -24,10 +24,10 @@ public class StandardHipChatService implements HipChatService {
    }
 
    public void publish(String message) {
-      publish(message, MessageColor.YELLOW);
+      publish(message, "yellow");
    }
 
-   public void publish(String message, MessageColor color) {
+   public void publish(String message, String color) {
       logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
 
       HttpClient client = new HttpClient();
@@ -37,7 +37,7 @@ public class StandardHipChatService implements HipChatService {
          post.addParameter("from", from);
          post.addParameter("room_id", roomId);
          post.addParameter("message", message);
-         post.addParameter("color", color.toString().toLowerCase());
+         post.addParameter("color", color);
          client.executeMethod(post);
       }
       catch(HttpException e) {

@@ -33,35 +33,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
    public void deleted(AbstractBuild r) {}
 
-   public void started(AbstractBuild r) {
-      String changes = getChanges(r);
-      CauseAction cause = r.getAction(CauseAction.class);
-      if(changes != null) {
-         this.hipChat.publish(changes);
-      }
-      else if(cause != null) {
-         MessageBuilder message = new MessageBuilder(notifier, r);
-         message.append(cause.getShortDescription());
-         this.hipChat.publish(message.appendOpenLink().toString());
-      }
-      else {
-         this.hipChat.publish(getBuildStatusMessage(r));
-      }
-   }
+   public void started(AbstractBuild r) {}
 
    public void finalized(AbstractBuild r) {}
 
    public void completed(AbstractBuild r) {
-      String message = getBuildStatusMessage(r);
-      MessageColor color = getBuildColor(r.getResult());
-      this.hipChat.publish(message, color);
-   }
-
-   public MessageColor getBuildColor(Result result) {
-      if(result == Result.SUCCESS) return MessageColor.GREEN;
-      if(result == Result.FAILURE) return MessageColor.RED;
-      if(result == Result.UNSTABLE) return MessageColor.RED;
-      return HipChatService.MessageColor.YELLOW;
+      this.hipChat.publish(getBuildStatusMessage(r), getBuildColor(r));
    }
 
    String getChanges(AbstractBuild r) {
@@ -94,6 +71,19 @@ public class ActiveNotifier implements FineGrainedNotifier {
       message.append(" file(s) changed)");
       return message.appendOpenLink().toString();
    }
+
+    static String getBuildColor(AbstractBuild r ) {
+      Result result = r.getResult();
+      if(result == Result.SUCCESS) {
+        return "green";
+      }
+      else if(result == Result.FAILURE) {
+        return "red";
+      }
+      else {
+        return "yellow";
+      }
+    }
 
    String getBuildStatusMessage(AbstractBuild r) {
       MessageBuilder message = new MessageBuilder(notifier, r);
