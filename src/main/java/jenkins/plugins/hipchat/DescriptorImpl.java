@@ -1,5 +1,6 @@
 package jenkins.plugins.hipchat;
 
+import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
@@ -10,6 +11,7 @@ import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.StaplerRequest;
 
+@Extension
 public class DescriptorImpl extends BuildStepDescriptor<Publisher> {
    private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 

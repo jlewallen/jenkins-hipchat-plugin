@@ -1,6 +1,5 @@
 package jenkins.plugins.hipchat;
 
-import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Build;
 import hudson.model.BuildListener;
@@ -11,23 +10,27 @@ import hudson.tasks.Notifier;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.kohsuke.stapler.DataBoundConstructor;
+
 @SuppressWarnings({ "unchecked" })
 public class HipChatNotifier extends Notifier {
 
    private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 
-   @Extension
-   public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
-
    private String jenkinsUrl;
    private String authToken;
    private String roomId;
+
+   @Override
+   public DescriptorImpl getDescriptor() {
+      return (DescriptorImpl)super.getDescriptor();
+   }
 
    /**
     * Used by the config.jelly
     */
    public String getProjectSpecificRoomId() {
-      if(DESCRIPTOR.getRoom().equals(roomId)) {
+      if(getDescriptor().getRoom().equals(roomId)) {
          return null;
       }
       else {
@@ -47,13 +50,22 @@ public class HipChatNotifier extends Notifier {
       return jenkinsUrl;
    }
 
-   public HipChatNotifier() {
-      this(DESCRIPTOR.getToken(), DESCRIPTOR.getRoom(), DESCRIPTOR.getJenkinsUrl());
+   public void setJenkinsUrl(String jenkinsUrl) {
+      this.jenkinsUrl = jenkinsUrl;
    }
 
-   public HipChatNotifier(String token, String roomId, String jenkinsUrl) {
+   public void setAuthToken(String authToken) {
+      this.authToken = authToken;
+   }
+
+   public void setRoomId(String roomId) {
+      this.roomId = roomId;
+   }
+
+   @DataBoundConstructor
+   public HipChatNotifier(String authToken, String roomId, String jenkinsUrl) {
       super();
-      this.authToken = token;
+      this.authToken = authToken;
       this.jenkinsUrl = jenkinsUrl;
       this.roomId = roomId;
    }
