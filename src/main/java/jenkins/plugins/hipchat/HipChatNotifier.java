@@ -3,7 +3,6 @@ package jenkins.plugins.hipchat;
 import hudson.Launcher;
 import hudson.model.Build;
 import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 
@@ -68,13 +67,6 @@ public class HipChatNotifier extends Notifier {
       this.authToken = authToken;
       this.jenkinsUrl = jenkinsUrl;
       this.roomId = roomId;
-   }
-
-   @Override
-   public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-      FineGrainedNotifier notifier = new ActiveNotifier(this);
-      notifier.started(build);
-      return super.prebuild(build, listener);
    }
 
    public boolean perform(Build<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
