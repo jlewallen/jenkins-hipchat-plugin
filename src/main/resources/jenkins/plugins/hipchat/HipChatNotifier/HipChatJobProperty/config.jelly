@@ -1,0 +1,13 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+	<f:section title="HipChat Notifications">
+    	<f:entry title="Project Room">
+      		<f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
+    	</f:entry>
+    
+    	<f:entry title="Start Notification">
+      		<f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
+    	</f:entry>
+    </f:section>
+
+</j:jelly>

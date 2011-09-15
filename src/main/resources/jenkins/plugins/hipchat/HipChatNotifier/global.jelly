@@ -16,7 +16,6 @@
         <f:textbox name="hipChatToken" value="${descriptor.getToken()}" />
     </f:entry>
     <f:entry title="Room" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatRoom.html">
-    	<a target="_blank" href="https://api.hipchat.com/v1/rooms/list?format=json&amp;auth_token=${descriptor.getToken()}">View Rooms JSON</a> (Requires AuthToken to be configured)
         <f:textbox name="hipChatRoom" value="${descriptor.getRoom()}" />
     </f:entry>
     <f:entry title="Jenkins URL" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatJenkinsUrl.html">

@@ -1,7 +1,9 @@
 package jenkins.plugins.hipchat;
 
+import hudson.Util;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.CauseAction;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.AffectedFile;
@@ -21,12 +23,16 @@ public class ActiveNotifier implements FineGrainedNotifier {
    private static final Logger logger = Logger.getLogger(HipChatListener.class.getName());
 
    HipChatNotifier notifier;
-   HipChatService hipChat;
 
    public ActiveNotifier(HipChatNotifier notifier) {
       super();
       this.notifier = notifier;
-      this.hipChat = notifier.newHipChatService();
+   }
+
+   private HipChatService getHipChat(AbstractBuild r) {
+      AbstractProject<?, ?> project = r.getProject();
+      String projectRoom = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getRoom());
+      return notifier.newHipChatService(projectRoom);
    }
 
    public void deleted(AbstractBuild r) {}
@@ -35,22 +41,22 @@ public class ActiveNotifier implements FineGrainedNotifier {
       String changes = getChanges(r);
       CauseAction cause = r.getAction(CauseAction.class);
       if(changes != null) {
-         this.hipChat.publish(changes);
+         getHipChat(r).publish(changes);
       }
       else if(cause != null) {
          MessageBuilder message = new MessageBuilder(notifier, r);
          message.append(cause.getShortDescription());
-         this.hipChat.publish(message.appendOpenLink().toString());
+         getHipChat(r).publish(message.appendOpenLink().toString());
       }
       else {
-         this.hipChat.publish(getBuildStatusMessage(r));
+         getHipChat(r).publish(getBuildStatusMessage(r));
       }
    }
 
    public void finalized(AbstractBuild r) {}
 
    public void completed(AbstractBuild r) {
-      this.hipChat.publish(getBuildStatusMessage(r), getBuildColor(r));
+      getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
    }
 
    String getChanges(AbstractBuild r) {
