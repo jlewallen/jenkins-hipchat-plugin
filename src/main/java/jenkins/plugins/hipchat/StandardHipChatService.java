@@ -13,13 +13,13 @@ public class StandardHipChatService implements HipChatService {
    private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
 
    private String token;
-   private String roomId;
+   private String[] roomIds;
    private String from;
 
    public StandardHipChatService(String token, String roomId, String from) {
       super();
       this.token = token;
-      this.roomId = roomId;
+      this.roomIds = roomId.split(",");
       this.from = from;
    }
 
@@ -28,26 +28,27 @@ public class StandardHipChatService implements HipChatService {
    }
 
    public void publish(String message, String color) {
-      logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
-
-      HttpClient client = new HttpClient();
-      String url = "https://api.hipchat.com/v1/rooms/message?auth_token=" + token;
-      PostMethod post = new PostMethod(url);
-      try {
-         post.addParameter("from", from);
-         post.addParameter("room_id", roomId);
-         post.addParameter("message", message);
-         post.addParameter("color", color);
-         client.executeMethod(post);
-      }
-      catch(HttpException e) {
-         throw new RuntimeException("Error posting to HipChat", e);
-      }
-      catch(IOException e) {
-         throw new RuntimeException("Error posting to HipChat", e);
-      }
-      finally {
-         post.releaseConnection();
+      for(String roomId : roomIds) {
+         logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
+         HttpClient client = new HttpClient();
+         String url = "https://api.hipchat.com/v1/rooms/message?auth_token=" + token;
+         PostMethod post = new PostMethod(url);
+         try {
+            post.addParameter("from", from);
+            post.addParameter("room_id", roomId);
+            post.addParameter("message", message);
+            post.addParameter("color", color);
+            client.executeMethod(post);
+         }
+         catch(HttpException e) {
+            throw new RuntimeException("Error posting to HipChat", e);
+         }
+         catch(IOException e) {
+            throw new RuntimeException("Error posting to HipChat", e);
+         }
+         finally {
+            post.releaseConnection();
+         }
       }
    }
 
