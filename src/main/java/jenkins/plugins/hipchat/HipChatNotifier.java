@@ -1,6 +1,7 @@
 package jenkins.plugins.hipchat;
 
 import hudson.Extension;
+import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.JobPropertyDescriptor;
@@ -12,6 +13,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -73,6 +75,11 @@ public class HipChatNotifier extends Notifier {
 
    public HipChatService newHipChatService(String room) {
       return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, "Jenkins");
+   }
+   
+   @Override
+   public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+       return true;
    }
 
    @Extension
