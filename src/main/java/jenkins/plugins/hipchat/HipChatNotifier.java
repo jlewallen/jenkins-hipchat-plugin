@@ -103,7 +103,6 @@ public class HipChatNotifier extends Notifier {
       public boolean isApplicable(Class<? extends AbstractProject> aClass) {
          return true;
       }
-      
 
       @Override
       public HipChatNotifier newInstance(StaplerRequest sr) {
@@ -135,8 +134,6 @@ public class HipChatNotifier extends Notifier {
       public String getDisplayName() {
          return "HipChat Notifications";
       }
-      
-
    }
 
    public static class HipChatJobProperty extends hudson.model.JobProperty<AbstractProject<?, ?>> {
