@@ -38,6 +38,7 @@ public class StandardHipChatService implements HipChatService {
             post.addParameter("room_id", roomId);
             post.addParameter("message", message);
             post.addParameter("color", color);
+            post.addParameter("notify", shouldNotify(color));
             client.executeMethod(post);
          }
          catch(HttpException e) {
@@ -50,6 +51,10 @@ public class StandardHipChatService implements HipChatService {
             post.releaseConnection();
          }
       }
+   }
+
+   private String shouldNotify(String color) {
+      return color.equalsIgnoreCase("green") ? "0" : "1";
    }
 
    public void rooms() {

@@ -37,23 +37,27 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
    public void deleted(AbstractBuild r) {}
 
-   public void started(AbstractBuild r) {
-      String changes = getChanges(r);
-      CauseAction cause = r.getAction(CauseAction.class);
+   public void started(AbstractBuild build) {
+      String changes = getChanges(build);
+      CauseAction cause = build.getAction(CauseAction.class);
       if(changes != null) {
-         getHipChat(r).publish(changes);
+         notifyStart(build, changes);
       }
       else if(cause != null) {
-         MessageBuilder message = new MessageBuilder(notifier, r);
+         MessageBuilder message = new MessageBuilder(notifier, build);
          message.append(cause.getShortDescription());
-         getHipChat(r).publish(message.appendOpenLink().toString());
+         notifyStart(build, message.appendOpenLink().toString());
       }
       else {
-         getHipChat(r).publish(getBuildStatusMessage(r));
+         notifyStart(build, getBuildStatusMessage(build));
       }
    }
 
-   public void finalized(AbstractBuild r) {}
+   private void notifyStart(AbstractBuild build, String message) {
+      getHipChat(build).publish(message, "green");
+   }
+
+    public void finalized(AbstractBuild r) {}
 
    public void completed(AbstractBuild r) {
       getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
