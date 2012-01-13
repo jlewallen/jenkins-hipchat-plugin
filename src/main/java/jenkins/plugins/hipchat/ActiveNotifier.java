@@ -46,10 +46,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
       else if(cause != null) {
          MessageBuilder message = new MessageBuilder(notifier, r);
          message.append(cause.getShortDescription());
-         getHipChat(r).publish(message.appendOpenLink().toString());
+         getHipChat(r).publish(message.appendOpenLink().toString(), "green");
       }
       else {
-         getHipChat(r).publish(getBuildStatusMessage(r));
+         getHipChat(r).publish(getBuildStatusMessage(r), "green");
       }
    }
 
