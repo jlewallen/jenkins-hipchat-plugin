@@ -4,16 +4,14 @@
 		<groupId>org.jvnet.hudson.plugins</groupId>
 		<artifactId>plugin</artifactId>
 		<version>1.319</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.jlewallen.jenkins.plugins</groupId>
-	<artifactId>jenkins-hipchat-plugin</artifactId>
+	<artifactId>hipchat-plugin</artifactId>
 	<packaging>hpi</packaging>
 	<version>0.1.0-SNAPSHOT</version>
 	<name>Jenkins HipChat Plugin</name>
 	<description>A Build status publisher that notifies channels on a HipChat server</description>
-	<url></url>
 	<licenses>
 		<license>
 			<name>MIT license</name>
@@ -21,9 +19,9 @@
 		</license>
 	</licenses>
     <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/hipchat-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/hipchat-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/hipchat-plugin</url>
+        <connection>scm:git:ssh://github.com/darrinholst/jenkins-hipchat-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/darrinholst/jenkins-hipchat-plugin.git</developerConnection>
+        <url>https://github.com/darrinholst/jenkins-hipchat-plugin</url>
     </scm>
     <distributionManagement>
         <repository>
