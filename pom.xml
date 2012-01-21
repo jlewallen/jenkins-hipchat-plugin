@@ -9,7 +9,7 @@
 	<groupId>com.github.jlewallen.jenkins.plugins</groupId>
 	<artifactId>hipchat-plugin</artifactId>
 	<packaging>hpi</packaging>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>Jenkins HipChat Plugin</name>
 	<description>A Build status publisher that notifies channels on a HipChat server</description>
 	<licenses>
