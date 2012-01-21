@@ -19,9 +19,9 @@
 		</license>
 	</licenses>
     <scm>
-        <connection>scm:git:ssh://github.com/darrinholst/jenkins-hipchat-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/darrinholst/jenkins-hipchat-plugin.git</developerConnection>
-        <url>https://github.com/darrinholst/jenkins-hipchat-plugin</url>
+        <connection>scm:git:ssh://github.com/jlewallen/jenkins-hipchat-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jlewallen/jenkins-hipchat-plugin.git</developerConnection>
+        <url>https://github.com/jlewallen/jenkins-hipchat-plugin</url>
     </scm>
     <distributionManagement>
         <repository>
