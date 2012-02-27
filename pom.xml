@@ -29,9 +29,9 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:ssh://github.com/jlewallen/jenkins-hipchat-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jlewallen/jenkins-hipchat-plugin.git</developerConnection>
-        <url>https://github.com/jlewallen/jenkins-hipchat-plugin</url>
+        <connection>scm:git:ssh://github.com/jenkins/hipchat-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jenkins/hipchat-plugin.git</developerConnection>
+        <url>https://github.com/jenkins/hipchat-plugin</url>
     </scm>
 
 	<dependencies>
