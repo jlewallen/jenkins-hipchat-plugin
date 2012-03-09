@@ -88,6 +88,10 @@ public class HipChatNotifier extends Notifier {
       private String room;
       private String jenkinsUrl;
 
+      public DescriptorImpl() {
+         load();
+      }
+
       public String getToken() {
          return token;
       }
