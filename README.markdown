@@ -1,5 +1,3 @@
-## HipChat plugin for Jenkins
+## Please fork and send pull requests to [jlewallen/jenkins-hipchat-plugin](https://github.com/jlewallen/jenkins-hipchat-plugin)
 
-Started with a fork of the Campfire plugin:
-
-https://github.com/jgp/hudson_campfire_plugin
+This repo will be updated from that, thanks!
