@@ -39,6 +39,7 @@ public class StandardHipChatService implements HipChatService {
             post.addParameter("message", message);
             post.addParameter("color", color);
             post.addParameter("notify", shouldNotify(color));
+            post.getParams().setContentCharset("UTF-8");
             client.executeMethod(post);
          }
          catch(Exception e) {
