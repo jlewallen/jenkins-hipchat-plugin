@@ -9,7 +9,7 @@
 
 	<artifactId>hipchat</artifactId>
 	<packaging>hpi</packaging>
-	<version>0.1.4-SNAPSHOT</version>
+	<version>0.1.4</version>
 	<name>Jenkins HipChat Plugin</name>
 	<description>A Build status publisher that notifies channels on a HipChat server</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/HipChat+Plugin</url>
