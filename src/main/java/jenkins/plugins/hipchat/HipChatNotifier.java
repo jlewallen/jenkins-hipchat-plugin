@@ -28,7 +28,7 @@ public class HipChatNotifier extends Notifier {
 
    private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 
-   private String jenkinsUrl;
+   private String buildServerUrl;
    private String authToken;
    private String room;
 
@@ -45,12 +45,12 @@ public class HipChatNotifier extends Notifier {
       return authToken;
    }
 
-   public String getJenkinsUrl() {
-      return jenkinsUrl;
+   public String getBuildServerUrl() {
+      return buildServerUrl;
    }
 
-   public void setJenkinsUrl(String jenkinsUrl) {
-      this.jenkinsUrl = jenkinsUrl;
+   public void setBuildServerUrl(String buildServerUrl) {
+      this.buildServerUrl = buildServerUrl;
    }
 
    public void setAuthToken(String authToken) {
@@ -62,10 +62,10 @@ public class HipChatNotifier extends Notifier {
    }
 
    @DataBoundConstructor
-   public HipChatNotifier(String authToken, String room, String jenkinsUrl) {
+   public HipChatNotifier(String authToken, String room, String buildServerUrl) {
       super();
       this.authToken = authToken;
-      this.jenkinsUrl = jenkinsUrl;
+      this.buildServerUrl = buildServerUrl;
       this.room = room;
    }
 
@@ -76,7 +76,7 @@ public class HipChatNotifier extends Notifier {
    public HipChatService newHipChatService(String room) {
       return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, "Jenkins");
    }
-   
+
    @Override
    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
        return true;
@@ -86,7 +86,7 @@ public class HipChatNotifier extends Notifier {
    public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
       private String token;
       private String room;
-      private String jenkinsUrl;
+      private String buildServerUrl;
 
       public DescriptorImpl() {
          load();
@@ -100,8 +100,8 @@ public class HipChatNotifier extends Notifier {
          return room;
       }
 
-      public String getJenkinsUrl() {
-         return jenkinsUrl;
+      public String getBuildServerUrl() {
+         return buildServerUrl;
       }
 
       public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -111,21 +111,21 @@ public class HipChatNotifier extends Notifier {
       @Override
       public HipChatNotifier newInstance(StaplerRequest sr) {
          if(token == null) token = sr.getParameter("hipChatToken");
-         if(jenkinsUrl == null) jenkinsUrl = sr.getParameter("hipChatJenkinsUrl");
+         if(buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
          if(room == null) room = sr.getParameter("hipChatRoom");
-         return new HipChatNotifier(token, room, jenkinsUrl);
+         return new HipChatNotifier(token, room, buildServerUrl);
       }
 
       @Override
       public boolean configure(StaplerRequest sr, JSONObject formData) throws FormException {
          token = sr.getParameter("hipChatToken");
          room = sr.getParameter("hipChatRoom");
-         jenkinsUrl = sr.getParameter("hipChatJenkinsUrl");
-         if(jenkinsUrl != null && !jenkinsUrl.endsWith("/")) {
-            jenkinsUrl = jenkinsUrl + "/";
+         buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
+         if(buildServerUrl != null && !buildServerUrl.endsWith("/")) {
+            buildServerUrl = buildServerUrl + "/";
          }
          try {
-            new HipChatNotifier(token, room, jenkinsUrl);
+            new HipChatNotifier(token, room, buildServerUrl);
          }
          catch(Exception e) {
             throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");

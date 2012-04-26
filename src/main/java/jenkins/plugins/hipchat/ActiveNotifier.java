@@ -163,7 +163,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
       }
 
       public MessageBuilder appendOpenLink() {
-         String url = notifier.getJenkinsUrl() + build.getUrl();
+         String url = notifier.getBuildServerUrl() + build.getUrl();
          message.append(" (<a href='").append(url).append("'>Open</a>)");
          return this;
       }
