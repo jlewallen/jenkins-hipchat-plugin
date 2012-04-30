@@ -21,5 +21,8 @@
     <f:entry title="Build Server URL" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatBuildServerUrl.html">
         <f:textbox name="hipChatBuildServerUrl" value="${descriptor.getBuildServerUrl()}" />
     </f:entry>
+    <f:entry title="Send As" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatSendAs.html">
+        <f:textbox name="hipChatSendAs" value="${descriptor.getSendAs()}" />
+    </f:entry>
   </f:section>
 </j:jelly>

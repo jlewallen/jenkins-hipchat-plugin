@@ -28,11 +28,12 @@ public class HipChatNotifier extends Notifier {
 
    private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 
-   private String buildServerUrl;
    private String authToken;
+   private String buildServerUrl;
    private String room;
+   private String sendAs;
 
-   @Override
+    @Override
    public DescriptorImpl getDescriptor() {
       return (DescriptorImpl)super.getDescriptor();
    }
@@ -49,32 +50,40 @@ public class HipChatNotifier extends Notifier {
       return buildServerUrl;
    }
 
-   public void setBuildServerUrl(String buildServerUrl) {
+   public String getSendAs() {
+   return sendAs;
+   }
+   public void setBuildServerUrl(final String buildServerUrl) {
       this.buildServerUrl = buildServerUrl;
    }
 
-   public void setAuthToken(String authToken) {
+   public void setAuthToken(final String authToken) {
       this.authToken = authToken;
    }
 
-   public void setRoom(String room) {
+   public void setRoom(final String room) {
       this.room = room;
    }
 
+   public void setSendAs(final String sendAs) {
+       this.sendAs = sendAs;
+   }
+
    @DataBoundConstructor
-   public HipChatNotifier(String authToken, String room, String buildServerUrl) {
+   public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs) {
       super();
       this.authToken = authToken;
       this.buildServerUrl = buildServerUrl;
       this.room = room;
+      this.sendAs = sendAs;
    }
 
    public BuildStepMonitor getRequiredMonitorService() {
       return BuildStepMonitor.BUILD;
    }
 
-   public HipChatService newHipChatService(String room) {
-      return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, "Jenkins");
+   public HipChatService newHipChatService(final String room) {
+      return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, getSendAs() == null ? "Build Server" : getSendAs());
    }
 
    @Override
@@ -87,8 +96,9 @@ public class HipChatNotifier extends Notifier {
       private String token;
       private String room;
       private String buildServerUrl;
+      private String sendAs;
 
-      public DescriptorImpl() {
+       public DescriptorImpl() {
          load();
       }
 
@@ -104,6 +114,10 @@ public class HipChatNotifier extends Notifier {
          return buildServerUrl;
       }
 
+       public String getSendAs() {
+           return sendAs;
+       }
+
       public boolean isApplicable(Class<? extends AbstractProject> aClass) {
          return true;
       }
@@ -113,7 +127,8 @@ public class HipChatNotifier extends Notifier {
          if(token == null) token = sr.getParameter("hipChatToken");
          if(buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
          if(room == null) room = sr.getParameter("hipChatRoom");
-         return new HipChatNotifier(token, room, buildServerUrl);
+         if(sendAs == null) sendAs = sr.getParameter("sendAs");
+         return new HipChatNotifier(token, room, buildServerUrl, sendAs);
       }
 
       @Override
@@ -121,11 +136,12 @@ public class HipChatNotifier extends Notifier {
          token = sr.getParameter("hipChatToken");
          room = sr.getParameter("hipChatRoom");
          buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
+         sendAs = sr.getParameter("hipChatSendAs");
          if(buildServerUrl != null && !buildServerUrl.endsWith("/")) {
             buildServerUrl = buildServerUrl + "/";
          }
          try {
-            new HipChatNotifier(token, room, buildServerUrl);
+            new HipChatNotifier(token, room, buildServerUrl, sendAs);
          }
          catch(Exception e) {
             throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
@@ -143,6 +159,7 @@ public class HipChatNotifier extends Notifier {
    public static class HipChatJobProperty extends hudson.model.JobProperty<AbstractProject<?, ?>> {
       private String room;
       private boolean startNotification;
+
 
       @DataBoundConstructor
       public HipChatJobProperty(String room, boolean startNotification) {
