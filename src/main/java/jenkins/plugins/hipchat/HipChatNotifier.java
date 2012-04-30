@@ -121,7 +121,7 @@ public class HipChatNotifier extends Notifier {
             if (token == null) token = sr.getParameter("hipChatToken");
             if (buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             if (room == null) room = sr.getParameter("hipChatRoom");
-            if (sendAs == null) sendAs = sr.getParameter("sendAs");
+            if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
             return new HipChatNotifier(token, room, buildServerUrl, sendAs);
         }
 
