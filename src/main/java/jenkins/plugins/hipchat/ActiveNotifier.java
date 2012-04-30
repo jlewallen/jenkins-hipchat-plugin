@@ -40,6 +40,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
    public void started(AbstractBuild build) {
       String changes = getChanges(build);
       CauseAction cause = build.getAction(CauseAction.class);
+
       if(changes != null) {
          notifyStart(build, changes);
       }
@@ -60,7 +61,18 @@ public class ActiveNotifier implements FineGrainedNotifier {
     public void finalized(AbstractBuild r) {}
 
    public void completed(AbstractBuild r) {
-      getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
+
+      AbstractProject<?, ?> project = r.getProject();
+      HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
+      Result result = r.getResult();
+      if( (result == Result.ABORTED && jobProperty.getNotifyAborted())
+              || (result == Result.FAILURE && jobProperty.getNotifyFailure())
+              || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
+              || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
+              || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
+          getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
+      }
+
    }
 
    String getChanges(AbstractBuild r) {

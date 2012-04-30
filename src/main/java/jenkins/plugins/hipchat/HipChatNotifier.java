@@ -159,12 +159,23 @@ public class HipChatNotifier extends Notifier {
    public static class HipChatJobProperty extends hudson.model.JobProperty<AbstractProject<?, ?>> {
       private String room;
       private boolean startNotification;
+      private boolean notifySuccess;
+      private boolean notifyAborted;
+      private boolean notifyNotBuilt;
+      private boolean notifyUnstable;
+      private boolean notifyFailure;
+
 
 
       @DataBoundConstructor
-      public HipChatJobProperty(String room, boolean startNotification) {
+      public HipChatJobProperty(String room, boolean startNotification, boolean notifyAborted, boolean notifyFailure, boolean notifyNotBuilt, boolean notifySuccess, boolean notifyUnstable) {
          this.room = room;
          this.startNotification = startNotification;
+         this.notifyAborted = notifyAborted;
+         this.notifyFailure = notifyFailure;
+         this.notifyNotBuilt = notifyNotBuilt;
+         this.notifySuccess = notifySuccess;
+         this.notifyUnstable = notifyUnstable;
       }
 
       @Exported
@@ -176,6 +187,11 @@ public class HipChatNotifier extends Notifier {
       public boolean getStartNotification() {
          return startNotification;
       }
+
+       @Exported
+       public boolean getNotifySuccess() {
+           return notifySuccess;
+       }
 
       @Override
       public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
@@ -191,7 +207,27 @@ public class HipChatNotifier extends Notifier {
          return super.prebuild(build, listener);
       }
 
-      @Extension
+       @Exported
+       public boolean getNotifyAborted() {
+           return notifyAborted;
+       }
+
+       @Exported
+       public boolean getNotifyFailure() {
+           return notifyFailure;
+       }
+
+       @Exported
+       public boolean getNotifyNotBuilt() {
+           return notifyNotBuilt;
+       }
+
+       @Exported
+       public boolean getNotifyUnstable() {
+           return notifyUnstable;
+       }
+
+       @Extension
       public static final class DescriptorImpl extends JobPropertyDescriptor {
          public String getDisplayName() {
             return "HipChat Notifications";
@@ -204,7 +240,13 @@ public class HipChatNotifier extends Notifier {
 
          @Override
          public HipChatJobProperty newInstance(StaplerRequest sr, JSONObject formData) throws hudson.model.Descriptor.FormException {
-            return new HipChatJobProperty(sr.getParameter("hipChatProjectRoom"), sr.getParameter("hipChatStartNotification") != null);
+            return new HipChatJobProperty(sr.getParameter("hipChatProjectRoom"),
+                    sr.getParameter("hipChatStartNotification") != null,
+                    sr.getParameter("hipChatNotifyAborted") != null,
+                    sr.getParameter("hipChatNotifyFailure") != null,
+                    sr.getParameter("hipChatNotifyNotBuilt") != null,
+                    sr.getParameter("hipChatNotifySuccess") != null,
+                    sr.getParameter("hipChatNotifyUnstable") != null);
          }
       }
    }
