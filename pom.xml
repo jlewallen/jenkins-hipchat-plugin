@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.jvnet.hudson.plugins</groupId>
-		<artifactId>plugin</artifactId>
-		<version>1.319</version>
-	</parent>
 
+    <!-- change to this parent to compare building this plugin for Hudson -->
+	<!--
+    <parent>
+		<groupId>org.jvnet.hudson.plugins</groupId>
+		<artifactId>hudson-plugin-parent</artifactId>
+		<version>2.0.0</version>
+	</parent>
+	-->
+
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>1.447</version>
+    </parent>
+
+    <!-- keeping original groupId -->
+    <groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>hipchat</artifactId>
 	<packaging>hpi</packaging>
 	<version>0.1.2-SNAPSHOT</version>
@@ -14,7 +26,12 @@
 	<description>A Build status publisher that notifies channels on a HipChat server</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/HipChat+Plugin</url>
 
-	<licenses>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <licenses>
 		<license>
 			<name>MIT license</name>
 			<comments>All source code is under the MIT license.</comments>
@@ -36,18 +53,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.jvnet.hudson.main</groupId>
-			<artifactId>maven-plugin</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
-			<version>3.1-rc1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.hudson</groupId>
-			<artifactId>htmlunit</artifactId>
-			<version>2.2-hudson-10</version>
+			<version>3.1</version>
 		</dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -55,16 +63,34 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+        <!-- only here to prevent from being included inside hpi for hudson parent, not needed by project at all -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- only here to prevent from being included inside hpi for hudson parent, not needed by project at all -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy</goals>
-                </configuration>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                   <groupId>org.jenkins-ci.tools</groupId>
+                   <artifactId>maven-hpi-plugin</artifactId>
+                   <configuration>
+                       <disabledTestInjection>true</disabledTestInjection>
+                   </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
 </project>
