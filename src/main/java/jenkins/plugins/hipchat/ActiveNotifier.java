@@ -71,7 +71,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         AbstractProject<?, ?> project = r.getProject();
         HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
         Result result = r.getResult();
-        if (result != null && ((result == Result.ABORTED && jobProperty.getNotifyAborted())
+        if ((result != null && jobProperty != null) && ((result == Result.ABORTED && jobProperty.getNotifyAborted())
                 || (result == Result.FAILURE && jobProperty.getNotifyFailure())
                 || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
