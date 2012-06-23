@@ -4,7 +4,9 @@
     	<f:entry title="Project Room">
       		<f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
     	</f:entry>
-
+    	<f:entry title="Fail Room">
+      		<f:textbox name="hipChatFailRoom" value="${instance.getFailRoom()}"/>
+    	</f:entry>
     	<f:entry title="Notify Build Start">
       		<f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
     	</f:entry>

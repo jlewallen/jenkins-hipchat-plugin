@@ -30,8 +30,15 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
     private HipChatService getHipChat(AbstractBuild r) {
         AbstractProject<?, ?> project = r.getProject();
+        String failRoom = "";
         String projectRoom = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getRoom());
-        return notifier.newHipChatService(projectRoom);
+        HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
+        Result result = r.getResult();
+        if ((result == Result.FAILURE && jobProperty.getNotifyFailure()) ||
+            (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
+            failRoom = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getFailRoom());
+        } 
+        return notifier.newHipChatService(projectRoom, failRoom);
     }
 
     public void deleted(AbstractBuild r) {
@@ -64,11 +71,11 @@ public class ActiveNotifier implements FineGrainedNotifier {
         AbstractProject<?, ?> project = r.getProject();
         HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
         Result result = r.getResult();
-        if ((result == Result.ABORTED && jobProperty.getNotifyAborted())
+        if ((result != null && jobProperty != null) && ((result == Result.ABORTED && jobProperty.getNotifyAborted())
                 || (result == Result.FAILURE && jobProperty.getNotifyFailure())
                 || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
-                || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
+                || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable()))) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
 
