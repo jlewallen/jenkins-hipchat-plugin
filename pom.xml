@@ -2,26 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- change to this parent to compare building this plugin for Hudson -->
-	<!--
     <parent>
 		<groupId>org.jvnet.hudson.plugins</groupId>
-		<artifactId>hudson-plugin-parent</artifactId>
-		<version>2.0.0</version>
-	</parent>
-	-->
-
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>1.447</version>
+		<artifactId>plugin</artifactId>
+		<version>1.395</version>
     </parent>
-
+    
     <!-- keeping original groupId -->
     <groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>hipchat</artifactId>
 	<packaging>hpi</packaging>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.1.6-SNAPSHOT</version>
 	<name>Jenkins HipChat Plugin</name>
 	<description>A Build status publisher that notifies channels on a HipChat server</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/HipChat+Plugin</url>
@@ -79,6 +70,7 @@
         </dependency>
     </dependencies>
 
+    <!--
     <build>
         <pluginManagement>
             <plugins>
@@ -92,5 +84,6 @@
             </plugins>
         </pluginManagement>
     </build>
+    -->
 
 </project>
