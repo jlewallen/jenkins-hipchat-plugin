@@ -1,10 +1,7 @@
 package jenkins.plugins.hipchat;
 
 import hudson.Util;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.CauseAction;
-import hudson.model.Result;
+import hudson.model.*;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.AffectedFile;
 import hudson.scm.ChangeLogSet.Entry;
@@ -60,18 +57,19 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     public void completed(AbstractBuild r) {
-
         AbstractProject<?, ?> project = r.getProject();
         HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
         Result result = r.getResult();
+        AbstractBuild<?, ?> previousBuild = project.getLastBuild().getPreviousBuild();
+        Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
         if ((result == Result.ABORTED && jobProperty.getNotifyAborted())
                 || (result == Result.FAILURE && jobProperty.getNotifyFailure())
                 || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
+                || (result == Result.SUCCESS && previousResult == Result.FAILURE && jobProperty.getNotifyBackToNormal())
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
-
     }
 
     String getChanges(AbstractBuild r) {
@@ -145,6 +143,9 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 return "Starting...";
             }
             Result result = r.getResult();
+            Run previousBuild = r.getProject().getLastBuild().getPreviousBuild();
+            Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
+            if (result == Result.SUCCESS && previousResult == Result.FAILURE) return "Back to normal";
             if (result == Result.SUCCESS) return "Success";
             if (result == Result.FAILURE) return "<b>FAILURE</b>";
             if (result == Result.ABORTED) return "ABORTED";
