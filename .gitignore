@@ -4,3 +4,7 @@ target
 .settings
 bin
 work
+
+# IDEA files
+.idea/
+*.iml
