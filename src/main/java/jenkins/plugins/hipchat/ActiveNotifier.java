@@ -51,13 +51,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
         messageParams.put("changes", changes);
         messageParams.put("link", getOpenLink(build));
 
-        if (notifier.getMessageTemplateStarted() == null || "".equals(notifier.getMessageTemplateStarted()))
-        {
-            logger.warning("Started message template is not set, using default");
-            notifier.setMessageTemplateStarted("{{build.project.displayName}} - {{build.displayName}}: {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}");
-        }
+        HipChatNotifier.HipChatJobProperty jobProperty = getJobPropertyForBuild(build);
+        String messageTemplate = getMessageTemplate(jobProperty.getMessageTemplateStarted(),
+                jobProperty.getMessageTemplateSuffix(),
+                "{{build.project.displayName}} - {{build.displayName}}: {{trigger}} {{{link}}}");
 
-        notifyStart(build, applyMessageTemplate(notifier.getMessageTemplateStarted(), messageParams));
+        notifyStart(build, applyMessageTemplate(messageTemplate, messageParams));
     }
 
     private void notifyStart(AbstractBuild build, String message) {
@@ -78,18 +77,27 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
 
-            if (notifier.getMessageTemplateCompleted() == null || "".equals(notifier.getMessageTemplateCompleted()))
-            {
-                logger.warning("Completed message template is not set, using default");
-                notifier.setMessageTemplateCompleted("{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}} {{{link}}}");
-            }
+            String messageTemplate = getMessageTemplate(jobProperty.getMessageTemplateCompleted(),
+                    jobProperty.getMessageTemplateSuffix(),
+                    "{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}} {{{link}}}");
 
-            getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
+            Map<String,Object> messageParams = new HashMap<String, Object>();
+            messageParams.put("build", r);
+            messageParams.put("status", getStatusMessage(r));
+            messageParams.put("link", getOpenLink(r));
+
+            getHipChat(r).publish(applyMessageTemplate(messageTemplate, messageParams), getBuildColor(r));
         }
 
     }
 
-    String getChanges(AbstractBuild r) {
+    private HipChatNotifier.HipChatJobProperty getJobPropertyForBuild(AbstractBuild r)
+    {
+        AbstractProject<?, ?> project = r.getProject();
+        return project.getProperty(HipChatNotifier.HipChatJobProperty.class);
+    }
+
+    private String getChanges(AbstractBuild r) {
         if (!r.hasChangeSetComputed()) {
             logger.info("No change set computed...");
             return null;
@@ -131,28 +139,28 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
     }
 
+    private String getMessageTemplate(String baseTemplate, String suffixTemplate, String defaultTemplate)
+    {
+        StringBuilder template = new StringBuilder();
+        if (baseTemplate == null || "".equals(baseTemplate))
+        {
+            template.append(defaultTemplate);
+        }
+        if (suffixTemplate != null && !"".equals(suffixTemplate)) {
+            template.append(" ");
+            template.append(suffixTemplate);
+        }
+        return template.toString();
+    }
+
+
     String applyMessageTemplate(String messageTemplate, Map<String,Object> messageParams)
     {
         StringWriter messageWriter = new StringWriter();
 
-        String actualTemplate = messageTemplate;
-        if (notifier.getMessageTemplateSuffix() != null)
-        {
-            actualTemplate += " " + notifier.getMessageTemplateSuffix();
-        }
-
-        Mustache mustache = this.mustacheFactory.compile(new StringReader(actualTemplate), "message");
+        Mustache mustache = this.mustacheFactory.compile(new StringReader(messageTemplate), "message");
         mustache.execute(messageWriter, messageParams);
         return messageWriter.toString();
-    }
-
-    String getBuildStatusMessage(AbstractBuild r) {
-        Map<String,Object> messageParams = new HashMap<String, Object>();
-        messageParams.put("build", r);
-        messageParams.put("status", getStatusMessage(r));
-        messageParams.put("link", getOpenLink(r));
-
-        return applyMessageTemplate(notifier.getMessageTemplateCompleted(), messageParams);
     }
 
     private String getStatusMessage(AbstractBuild r) {
