@@ -19,9 +19,6 @@ generate the HipChat notifications - this allows for easier customisation, as we
  used when you want to keep the same template overall and just override something that gets appended
  to the default messages.
 
- **Note** that if you change the messages in the global config you'll have to re-save any Jobs using
- the default for them to pick up the change!
-
  ### Available parameters
 
  #### Start message
