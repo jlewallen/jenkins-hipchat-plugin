@@ -81,7 +81,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             if (notifier.getMessageTemplateCompleted() == null)
             {
                 logger.warning("Completed message template is not set!");
-                notifier.setMessageTemplateCompleted("{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}}");
+                notifier.setMessageTemplateCompleted("{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}} {{{link}}}");
             }
 
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
@@ -150,6 +150,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         Map<String,Object> messageParams = new HashMap<String, Object>();
         messageParams.put("build", r);
         messageParams.put("status", MessageBuilder.getStatusMessage(r));
+        messageParams.put("link", MessageBuilder.getOpenLink(notifier, r));
 
         return applyMessageTemplate(notifier.getMessageTemplateCompleted(), messageParams);
     }

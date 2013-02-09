@@ -30,7 +30,7 @@
     </f:entry>
     <f:entry title="Completed message template" help="">
         <f:textbox name="hipChatMessageTemplateCompleted" value="${descriptor.getMessageTemplateCompleted()}"
-         default="{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}}" />
+         default="{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}} {{{link}}}" />
     </f:entry>
   </f:section>
 </j:jelly>
