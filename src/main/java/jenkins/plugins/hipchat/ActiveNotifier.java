@@ -48,7 +48,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         Map<String, Object> messageParams = new HashMap<String,Object>();
         messageParams.put("build", build);
         messageParams.put("changes", changes);
-        messageParams.put("link", MessageBuilder.getOpenLink(notifier, build));
+        messageParams.put("link", getOpenLink(build));
 
         if (notifier.getMessageTemplateStarted() == null || "".equals(notifier.getMessageTemplateStarted()))
         {
@@ -110,7 +110,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         for (Entry entry : entries) {
             authors.add(entry.getAuthor().getDisplayName());
         }
-        MessageBuilder message = new MessageBuilder(notifier, r);
+        StringBuilder message = new StringBuilder();
         message.append("by changes from ");
         message.append(StringUtils.join(authors, ", "));
         message.append(" (");
@@ -148,81 +148,28 @@ public class ActiveNotifier implements FineGrainedNotifier {
     String getBuildStatusMessage(AbstractBuild r) {
         Map<String,Object> messageParams = new HashMap<String, Object>();
         messageParams.put("build", r);
-        messageParams.put("status", MessageBuilder.getStatusMessage(r));
-        messageParams.put("link", MessageBuilder.getOpenLink(notifier, r));
+        messageParams.put("status", getStatusMessage(r));
+        messageParams.put("link", getOpenLink(r));
 
         return applyMessageTemplate(notifier.getMessageTemplateCompleted(), messageParams);
     }
 
-
-    public static class MessageBuilder {
-        private StringBuffer message;
-        private HipChatNotifier notifier;
-        private AbstractBuild build;
-
-        public MessageBuilder(HipChatNotifier notifier, AbstractBuild build) {
-            this.notifier = notifier;
-            this.message = new StringBuffer();
-            this.build = build;
-            startMessage();
+    private String getStatusMessage(AbstractBuild r) {
+        if (r.isBuilding()) {
+            return "Starting...";
         }
+        Result result = r.getResult();
+        if (result == Result.SUCCESS) return "Success";
+        if (result == Result.FAILURE) return "<b>FAILURE</b>";
+        if (result == Result.ABORTED) return "ABORTED";
+        if (result == Result.NOT_BUILT) return "Not built";
+        if (result == Result.UNSTABLE) return "Unstable";
+        return "Unknown";
+    }
 
-        public MessageBuilder appendStatusMessage() {
-            message.append(getStatusMessage(build));
-            return this;
-        }
-
-        static String getStatusMessage(AbstractBuild r) {
-            if (r.isBuilding()) {
-                return "Starting...";
-            }
-            Result result = r.getResult();
-            if (result == Result.SUCCESS) return "Success";
-            if (result == Result.FAILURE) return "<b>FAILURE</b>";
-            if (result == Result.ABORTED) return "ABORTED";
-            if (result == Result.NOT_BUILT) return "Not built";
-            if (result == Result.UNSTABLE) return "Unstable";
-            return "Unknown";
-        }
-
-        public MessageBuilder append(String string) {
-            message.append(string);
-            return this;
-        }
-
-        public MessageBuilder append(Object string) {
-            message.append(string.toString());
-            return this;
-        }
-
-        private MessageBuilder startMessage() {
-            message.append(build.getProject().getDisplayName());
-            message.append(" - ");
-            message.append(build.getDisplayName());
-            message.append(" ");
-            return this;
-        }
-
-        static String getOpenLink(HipChatNotifier notifier, AbstractBuild build)
-        {
-            String url = notifier.getBuildServerUrl() + build.getUrl();
-            return new StringBuilder("(<a href='").append(url).append("'>Open</a>)").toString();
-        }
-
-        public MessageBuilder appendOpenLink() {
-
-            message.append(" " + getOpenLink(notifier, build));
-            return this;
-        }
-
-        public MessageBuilder appendDuration() {
-            message.append(" after ");
-            message.append(build.getDurationString());
-            return this;
-        }
-
-        public String toString() {
-            return message.toString();
-        }
+    private String getOpenLink(AbstractBuild build)
+    {
+        String url = notifier.getBuildServerUrl() + build.getUrl();
+        return new StringBuilder("(<a href='").append(url).append("'>Open</a>)").toString();
     }
 }
