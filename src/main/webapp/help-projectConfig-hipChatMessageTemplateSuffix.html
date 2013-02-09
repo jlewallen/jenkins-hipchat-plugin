@@ -1,0 +1,13 @@
+<div>
+    <p>Specify a <a href="http://mustache.github.com/" target="_blank">Mustache</a> template that will be appended to the end of the
+        Build Started and Build Completed templates.</p>
+
+    <p>This can be used when you want a global base default template but just want to configure the last part of a
+    template on a per-job basis.  This is particularly useful when you want to include build parameters in the status
+    messages.</p>
+
+    <p>The variables available to this template is the same as for the template it is appended to (eg. Start or Complete).  Of particular
+    use might be build parameters which are available via <em>build.buildVariables</em>
+    (eg. <em>build.buildVariables.ENVIRONMENT</em>)</p>
+
+</div>
