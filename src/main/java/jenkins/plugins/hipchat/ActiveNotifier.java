@@ -47,13 +47,14 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
         Map<String, Object> messageParams = new HashMap<String,Object>();
         messageParams.put("build", build);
+        messageParams.put("cause", cause);
         messageParams.put("changes", changes);
         messageParams.put("link", getOpenLink(build));
 
         if (notifier.getMessageTemplateStarted() == null || "".equals(notifier.getMessageTemplateStarted()))
         {
             logger.warning("Started message template is not set, using default");
-            notifier.setMessageTemplateStarted("{{build.project.displayName}} - {{build.displayName}}: Started {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}");
+            notifier.setMessageTemplateStarted("{{build.project.displayName}} - {{build.displayName}}: {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}");
         }
 
         notifyStart(build, applyMessageTemplate(notifier.getMessageTemplateStarted(), messageParams));
@@ -111,7 +112,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             authors.add(entry.getAuthor().getDisplayName());
         }
         StringBuilder message = new StringBuilder();
-        message.append("by changes from ");
+        message.append("Started by changes from ");
         message.append(StringUtils.join(authors, ", "));
         message.append(" (");
         message.append(files.size());
