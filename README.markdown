@@ -37,3 +37,8 @@ generate the HipChat notifications - this allows for easier customisation, as we
  * **build** - see above
  * **status** - string describing the state of the build (eg. success, fail, etc)
  * **link** - link to the build in Jenkins
+
+ ### Using custom build parameters
+
+ Custom build parameters are available through ```{{build.buildVariables}}``` - for example if you have
+ a parameter called ENVIRONMENT then you would use ```{{build.buildVariables.ENVIRONMENT}}```.
