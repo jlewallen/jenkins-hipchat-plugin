@@ -12,7 +12,7 @@ generate the HipChat notifications - this allows for easier customisation, as we
 
  The default templates are:
 
- * Start message: ```{{build.project.displayName}} - {{build.displayName}}: Started {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}```
+ * Start message: ```{{build.project.displayName}} - {{build.displayName}}: {{trigger}} {{{link}}}```
  * Complete message: ```{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}}```
 
  There is also a per-Job configurable "Message suffix" - this is also a Mustache template and is
@@ -28,8 +28,8 @@ generate the HipChat notifications - this allows for easier customisation, as we
 
  * **build** - instance of [AbstractBuild](http://javadoc.jenkins-ci.org/hudson/model/AbstractBuild.html) -
    most of the information comes from this object (eg. ```{{build.project.displayName}}```)
- * **cause** - the "cause" string as to why the build was started
- * **changes** - a string describing the changes that caused the build to start
+ * **trigger** - a string describing why the build was started - tries to use the "changes" if available, otherwise
+  the "cause", and finally falls back to the string "Started..."
  * **link** - link to the build in Jenkins - note the triple-bracket to prevent HTML from being escaped
 
  #### Completed message

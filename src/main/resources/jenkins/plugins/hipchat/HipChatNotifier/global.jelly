@@ -26,7 +26,7 @@
     </f:entry>
     <f:entry title="Started message template" help="">
         <f:textbox name="hipChatMessageTemplateStarted" value="${descriptor.getMessageTemplateStarted()}"
-         default="{{build.project.displayName}} - {{build.displayName}}: {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}" />
+         default="{{build.project.displayName}} - {{build.displayName}}: {{trigger}} {{{link}}}" />
     </f:entry>
     <f:entry title="Completed message template" help="">
         <f:textbox name="hipChatMessageTemplateCompleted" value="${descriptor.getMessageTemplateCompleted()}"

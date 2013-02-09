@@ -45,10 +45,23 @@ public class ActiveNotifier implements FineGrainedNotifier {
         String changes = getChanges(build);
         CauseAction cause = build.getAction(CauseAction.class);
 
+        String trigger;
+        if (changes != null)
+        {
+            trigger = changes;
+        }
+        else if (cause != null)
+        {
+            trigger = cause.getShortDescription();
+        }
+        else
+        {
+            trigger = "Starting...";
+        }
+
         Map<String, Object> messageParams = new HashMap<String,Object>();
         messageParams.put("build", build);
-        messageParams.put("cause", cause);
-        messageParams.put("changes", changes);
+        messageParams.put("trigger", trigger);
         messageParams.put("link", getOpenLink(build));
 
         HipChatNotifier.HipChatJobProperty jobProperty = getJobPropertyForBuild(build);
