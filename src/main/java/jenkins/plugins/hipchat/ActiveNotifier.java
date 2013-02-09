@@ -50,11 +50,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
         messageParams.put("changes", changes);
         messageParams.put("link", MessageBuilder.getOpenLink(notifier, build));
 
-        if (notifier.getMessageTemplateStarted() == null)
+        if (notifier.getMessageTemplateStarted() == null || "".equals(notifier.getMessageTemplateStarted()))
         {
-            logger.warning("Started message template is not set!");
+            logger.warning("Started message template is not set, using default");
             notifier.setMessageTemplateStarted("{{build.project.displayName}} - {{build.displayName}}: Started {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}");
-            return;
         }
 
         notifyStart(build, applyMessageTemplate(notifier.getMessageTemplateStarted(), messageParams));
@@ -78,9 +77,9 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
 
-            if (notifier.getMessageTemplateCompleted() == null)
+            if (notifier.getMessageTemplateCompleted() == null || "".equals(notifier.getMessageTemplateCompleted()))
             {
-                logger.warning("Completed message template is not set!");
+                logger.warning("Completed message template is not set, using default");
                 notifier.setMessageTemplateCompleted("{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}} {{{link}}}");
             }
 
