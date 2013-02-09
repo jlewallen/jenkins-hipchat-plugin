@@ -1,5 +1,8 @@
 package jenkins.plugins.hipchat;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -10,10 +13,9 @@ import hudson.scm.ChangeLogSet.AffectedFile;
 import hudson.scm.ChangeLogSet.Entry;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.*;
 import java.util.logging.Logger;
 
 @SuppressWarnings("rawtypes")
@@ -22,10 +24,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
     private static final Logger logger = Logger.getLogger(HipChatListener.class.getName());
 
     HipChatNotifier notifier;
+    MustacheFactory mustacheFactory;
 
     public ActiveNotifier(HipChatNotifier notifier) {
         super();
         this.notifier = notifier;
+        this.mustacheFactory = new DefaultMustacheFactory();
     }
 
     private HipChatService getHipChat(AbstractBuild r) {
@@ -41,15 +45,19 @@ public class ActiveNotifier implements FineGrainedNotifier {
         String changes = getChanges(build);
         CauseAction cause = build.getAction(CauseAction.class);
 
-        if (changes != null) {
-            notifyStart(build, changes);
-        } else if (cause != null) {
-            MessageBuilder message = new MessageBuilder(notifier, build);
-            message.append(cause.getShortDescription());
-            notifyStart(build, message.appendOpenLink().toString());
-        } else {
-            notifyStart(build, getBuildStatusMessage(build));
+        Map<String, Object> messageParams = new HashMap<String,Object>();
+        messageParams.put("build", build);
+        messageParams.put("changes", changes);
+        messageParams.put("link", MessageBuilder.getOpenLink(notifier, build));
+
+        if (notifier.getMessageTemplateStarted() == null)
+        {
+            logger.warning("Started message template is not set!");
+            notifier.setMessageTemplateStarted("{{build.project.displayName}} - {{build.displayName}}: Started {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}");
+            return;
         }
+
+        notifyStart(build, applyMessageTemplate(notifier.getMessageTemplateStarted(), messageParams));
     }
 
     private void notifyStart(AbstractBuild build, String message) {
@@ -69,6 +77,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
+
+            if (notifier.getMessageTemplateCompleted() == null)
+            {
+                logger.warning("Completed message template is not set!");
+                notifier.setMessageTemplateCompleted("{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}}");
+            }
+
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
 
@@ -97,12 +112,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
             authors.add(entry.getAuthor().getDisplayName());
         }
         MessageBuilder message = new MessageBuilder(notifier, r);
-        message.append("Started by changes from ");
+        message.append("by changes from ");
         message.append(StringUtils.join(authors, ", "));
         message.append(" (");
         message.append(files.size());
         message.append(" file(s) changed)");
-        return message.appendOpenLink().toString();
+        return message.toString();
     }
 
     static String getBuildColor(AbstractBuild r) {
@@ -116,12 +131,29 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
     }
 
-    String getBuildStatusMessage(AbstractBuild r) {
-        MessageBuilder message = new MessageBuilder(notifier, r);
-        message.appendStatusMessage();
-        message.appendDuration();
-        return message.appendOpenLink().toString();
+    String applyMessageTemplate(String messageTemplate, Map<String,Object> messageParams)
+    {
+        StringWriter messageWriter = new StringWriter();
+
+        String actualTemplate = messageTemplate;
+        if (notifier.getMessageTemplateSuffix() != null)
+        {
+            actualTemplate += " " + notifier.getMessageTemplateSuffix();
+        }
+
+        Mustache mustache = this.mustacheFactory.compile(new StringReader(actualTemplate), "message");
+        mustache.execute(messageWriter, messageParams);
+        return messageWriter.toString();
     }
+
+    String getBuildStatusMessage(AbstractBuild r) {
+        Map<String,Object> messageParams = new HashMap<String, Object>();
+        messageParams.put("build", r);
+        messageParams.put("status", MessageBuilder.getStatusMessage(r));
+
+        return applyMessageTemplate(notifier.getMessageTemplateCompleted(), messageParams);
+    }
+
 
     public static class MessageBuilder {
         private StringBuffer message;
@@ -171,9 +203,15 @@ public class ActiveNotifier implements FineGrainedNotifier {
             return this;
         }
 
-        public MessageBuilder appendOpenLink() {
+        static String getOpenLink(HipChatNotifier notifier, AbstractBuild build)
+        {
             String url = notifier.getBuildServerUrl() + build.getUrl();
-            message.append(" (<a href='").append(url).append("'>Open</a>)");
+            return new StringBuilder("(<a href='").append(url).append("'>Open</a>)").toString();
+        }
+
+        public MessageBuilder appendOpenLink() {
+
+            message.append(" " + getOpenLink(notifier, build));
             return this;
         }
 

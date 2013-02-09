@@ -24,5 +24,13 @@
     <f:entry title="Send As" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatSendAs.html">
         <f:textbox name="hipChatSendAs" value="${descriptor.getSendAs()}" />
     </f:entry>
+    <f:entry title="Started message template" help="">
+        <f:textbox name="hipChatMessageTemplateStarted" value="${descriptor.getMessageTemplateStarted()}"
+         default="{{build.project.displayName}} - {{build.displayName}}: Started {{#cause}}{{cause.shortDescription}}{{/cause}} {{#changes}}{{changes}}{{/changes}} {{{link}}}" />
+    </f:entry>
+    <f:entry title="Completed message template" help="">
+        <f:textbox name="hipChatMessageTemplateCompleted" value="${descriptor.getMessageTemplateCompleted()}"
+         default="{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}}" />
+    </f:entry>
   </f:section>
 </j:jelly>
