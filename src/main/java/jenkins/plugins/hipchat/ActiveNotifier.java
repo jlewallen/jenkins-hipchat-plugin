@@ -92,7 +92,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
             String messageTemplate = getMessageTemplate(jobProperty.getMessageTemplateCompleted(),
                     jobProperty.getMessageTemplateSuffix(),
-                    "{{build.project.displayName}} - {{build.displayName}}: {{status}} after {{build.durationString}} {{{link}}}");
+                    "{{build.project.displayName}} - {{build.displayName}}: {{{status}}} after {{build.durationString}} {{{link}}}");
 
             Map<String,Object> messageParams = new HashMap<String, Object>();
             messageParams.put("build", r);
