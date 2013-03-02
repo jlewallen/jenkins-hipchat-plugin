@@ -29,7 +29,7 @@ public class StandardHipChatService implements HipChatService {
     public void publish(String message, String color) {
         for (String roomId : roomIds) {
             logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
-            HttpClient client = new HttpClient();
+            HttpClient client = getJenkinsClient();
             String url = "https://" + host + "/v1/rooms/message?auth_token=" + token;
             PostMethod post = new PostMethod(url);
 
@@ -47,6 +47,16 @@ public class StandardHipChatService implements HipChatService {
                 post.releaseConnection();
             }
         }
+    }
+    
+    private HttpClient getJenkinsClient() {
+        HttpClient client = new HttpClient();
+        if (Hudson.getInstance() != null) {
+            ProxyConfiguration proxy = Hudson.getInstance().proxy;
+            if (proxy != null) {
+                client.getHostConfiguration().setProxy(proxy.name, proxy.port);
+            }
+		}
     }
 
     private String shouldNotify(String color) {
