@@ -8,6 +8,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
@@ -47,21 +48,6 @@ public class HipChatNotifier extends Notifier {
         return sendAs;
     }
 
-    public void setBuildServerUrl(final String buildServerUrl) {
-        this.buildServerUrl = buildServerUrl;
-    }
-
-    public void setAuthToken(final String authToken) {
-        this.authToken = authToken;
-    }
-
-    public void setRoom(final String room) {
-        this.room = room;
-    }
-
-    public void setSendAs(final String sendAs) {
-        this.sendAs = sendAs;
-    }
 
     @DataBoundConstructor
     public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs) {
@@ -77,7 +63,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public HipChatService newHipChatService(final String room) {
-        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, getSendAs() == null ? "Build Server" : getSendAs());
+        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
     }
 
     @Override
