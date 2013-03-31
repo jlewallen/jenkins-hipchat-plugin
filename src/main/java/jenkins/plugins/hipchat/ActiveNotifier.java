@@ -191,7 +191,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
     private String getOpenLink(AbstractBuild build)
     {
-        String url = notifier.getBuildServerUrl() + build.getUrl();
-        return new StringBuilder("(<a href='").append(url).append("'>Open</a>)").toString();
+        StringBuilder builder = new StringBuilder("(<a href='");
+        builder.append(notifier.getBuildServerUrl());
+        builder.append(build.getUrl());
+        builder.append("'>Open</a>)");
+        return builder.toString();
     }
 }
