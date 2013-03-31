@@ -155,11 +155,11 @@ public class ActiveNotifier implements FineGrainedNotifier {
     private String getMessageTemplate(String baseTemplate, String suffixTemplate, String defaultTemplate)
     {
         StringBuilder template = new StringBuilder();
-        if (baseTemplate == null || "".equals(baseTemplate))
+        if (baseTemplate == null || StringUtils.isBlank(baseTemplate))
         {
             template.append(defaultTemplate);
         }
-        if (suffixTemplate != null && !"".equals(suffixTemplate)) {
+        if (suffixTemplate != null && StringUtils.isNotBlank(suffixTemplate)) {
             template.append(" ");
             template.append(suffixTemplate);
         }
