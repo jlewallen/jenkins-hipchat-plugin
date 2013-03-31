@@ -1,0 +1,14 @@
+<div>
+    <p>Specify a <a href="http://mustache.github.com/" target="_blank">Mustache</a> template that will be used to generate the
+        notification message sent to HipChat when a build is started</p>
+    <p>Available parameters are:
+    <ul>
+    <li><strong>build</strong>: the <a href="http://javadoc.jenkins-ci.org/hudson/model/AbstractBuild.html" target="_blank">AbstractBuild</a>
+        instance referring to the build - contains useful properties such as <em>build.project.displayName</em></li>
+    <li><strong>trigger</strong>: a string representing why the build was started</li>
+    <li><strong>link</strong>: a link to the Jenkins build</li>
+    </ul>
+    </p>
+    <p>You can set a global template here, or specify a template per-job. If neither is specified then a default will
+        be used.</p>
+</div>

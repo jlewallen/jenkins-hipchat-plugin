@@ -5,6 +5,18 @@
       		<f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
     	</f:entry>
 
+        <f:entry title="Build Started template" help="${rootURL}/plugin/hipchat/help-projectConfig-hipChatMessageTemplateStarted.html">
+            <f:textbox name="hipChatMessageTemplateStarted" value="${instance.getMessageTemplateStarted()}" />
+        </f:entry>
+
+        <f:entry title="Build Completed template" help="${rootURL}/plugin/hipchat/help-projectConfig-hipChatMessageTemplateCompleted.html">
+            <f:textbox name="hipChatMessageTemplateCompleted" value="${instance.getMessageTemplateCompleted()}" />
+        </f:entry>
+
+        <f:entry title="Template suffix" help="${rootURL}/plugin/hipchat/help-projectConfig-hipChatMessageTemplateSuffix.html">
+            <f:textbox name="hipChatMessageTemplateSuffix" value="${instance.getMessageTemplateSuffix()}" />
+        </f:entry>
+
     	<f:entry title="Notify Build Start">
       		<f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
     	</f:entry>

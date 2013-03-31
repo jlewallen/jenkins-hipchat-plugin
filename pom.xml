@@ -14,14 +14,14 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.447</version>
+        <version>1.500</version>
     </parent>
 
     <!-- keeping original groupId -->
     <groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>hipchat</artifactId>
 	<packaging>hpi</packaging>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.1.5-SNAPSHOT</version>
 	<name>Jenkins HipChat Plugin</name>
 	<description>A Build status publisher that notifies channels on a HipChat server</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/HipChat+Plugin</url>
@@ -76,6 +76,11 @@
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+            <version>0.8.9</version>
         </dependency>
     </dependencies>
 
