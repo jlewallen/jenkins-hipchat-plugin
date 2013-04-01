@@ -1,6 +1,7 @@
 package jenkins.plugins.hipchat;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import java.util.logging.Level;
@@ -40,7 +41,11 @@ public class StandardHipChatService implements HipChatService {
                 post.addParameter("color", color);
                 post.addParameter("notify", shouldNotify(color));
                 post.getParams().setContentCharset("UTF-8");
-                client.executeMethod(post);
+                int responseCode = client.executeMethod(post);
+                String response = post.getResponseBodyAsString();
+                if(responseCode != HttpStatus.SC_OK || ! response.contains("\"sent\"")) {
+                    logger.log(Level.WARNING, "HipChat post may have failed. Response: " + response);
+                }
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error posting to HipChat", e);
             } finally {
