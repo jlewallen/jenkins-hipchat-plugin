@@ -79,29 +79,8 @@ public class ActiveNotifier implements FineGrainedNotifier {
             logger.info("No change set computed...");
             return null;
         }
-        ChangeLogSet changeSet = r.getChangeSet();
-        List<Entry> entries = new LinkedList<Entry>();
-        Set<AffectedFile> files = new HashSet<AffectedFile>();
-        for (Object o : changeSet.getItems()) {
-            Entry entry = (Entry) o;
-            logger.info("Entry " + o);
-            entries.add(entry);
-            files.addAll(entry.getAffectedFiles());
-        }
-        if (entries.isEmpty()) {
-            logger.info("Empty change...");
-            return null;
-        }
-        Set<String> authors = new HashSet<String>();
-        for (Entry entry : entries) {
-            authors.add(entry.getAuthor().getDisplayName());
-        }
         MessageBuilder message = new MessageBuilder(notifier, r);
-        message.append("Started by changes from ");
-        message.append(StringUtils.join(authors, ", "));
-        message.append(" (");
-        message.append(files.size());
-        message.append(" file(s) changed)");
+        message.appendChanges();
         return message.appendOpenLink().toString();
     }
 
@@ -120,6 +99,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         MessageBuilder message = new MessageBuilder(notifier, r);
         message.appendStatusMessage();
         message.appendDuration();
+        message.appendChanges();
         return message.appendOpenLink().toString();
     }
 
@@ -133,6 +113,51 @@ public class ActiveNotifier implements FineGrainedNotifier {
             this.message = new StringBuffer();
             this.build = build;
             startMessage();
+        }
+
+        public void appendChanges() {
+            AbstractProject<?, ?> project = build.getProject();
+            HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
+
+            ChangeLogSet changeSet = build.getChangeSet();
+
+            if (changeSet.isEmptySet()) {
+                logger.info("Empty change...");
+                return;
+            }
+            
+            List<Entry> entries = new LinkedList<Entry>();
+            Set<AffectedFile> files = new HashSet<AffectedFile>();
+            for (Object o : changeSet.getItems()) {
+                Entry entry = (Entry) o;
+                logger.info("Entry " + o);
+                entries.add(entry);
+                files.addAll(entry.getAffectedFiles());
+            }
+            
+            if (jobProperty != null && jobProperty.getIncludeChangeDetails()) {
+                message.append(" Started by changes:");
+                for (Entry entry : entries) {
+                    final String commitMsg = entry.getMsg().length() > 45
+                                           ? entry.getMsg().substring(0, 45) + "..."
+                                           : entry.getMsg();
+                    final Integer fileCount = entry.getAffectedFiles().size();
+                    message.append("<br>&nbsp;&nbsp;" + commitMsg
+                            + " [" + entry.getAuthor().getDisplayName()
+                            + " / " + fileCount + " file(s)"
+                            + "]");
+                }
+            } else {
+                Set<String> authors = new HashSet<String>();
+                for (Entry entry : entries) {
+                    authors.add(entry.getAuthor().getDisplayName());
+                }
+                message.append(" Started by changes from ");
+                message.append(StringUtils.join(authors, ", "));
+                message.append(" (");
+                message.append(files.size());
+                message.append(" file(s) changed)"); 
+            }
         }
 
         public MessageBuilder appendStatusMessage() {
