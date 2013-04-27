@@ -133,21 +133,33 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 logger.info("Empty change...");
                 return;
             }
-
-            message.append("<br>Started by changes:");
-            for (Entry entry : entries) {
-                final String commitIsh = entry.getCommitId().length() > 10
-                                       ? entry.getCommitId().substring(0, 10)
-                                       : entry.getCommitId();
-                final String commitMsg = entry.getMsg().length() > 45
-                                       ? entry.getMsg().substring(0, 45) + "..."
-                                       : entry.getMsg();
-                final Integer fileCount = entry.getAffectedFiles().size();
-                message.append("<br>&nbsp;&nbsp;" + commitIsh
-                        + " " + commitMsg
-                        + " (" + entry.getAuthor().getDisplayName()
-                        + " / " + fileCount + " files"
-                        + ")<br>");
+            
+            if (jobProperty.getIncludeChangeDetails()) {
+                message.append("\n<br>Started by changes:");
+                for (Entry entry : entries) {
+                    final String commitIsh = entry.getCommitId().length() > 10
+                                           ? entry.getCommitId().substring(0, 10)
+                                           : entry.getCommitId();
+                    final String commitMsg = entry.getMsg().length() > 45
+                                           ? entry.getMsg().substring(0, 45) + "..."
+                                           : entry.getMsg();
+                    final Integer fileCount = entry.getAffectedFiles().size();
+                    message.append("\n<br>&nbsp;&nbsp;" + commitIsh
+                            + " " + commitMsg
+                            + " [" + entry.getAuthor().getDisplayName()
+                            + " / " + fileCount + " files"
+                            + "]");
+                }
+            } else {
+                Set<String> authors = new HashSet<String>();
+                for (Entry entry : entries) {
+                    authors.add(entry.getAuthor().getDisplayName());
+                }
+                message.append(" Started by changes from ");
+                message.append(StringUtils.join(authors, ", "));
+                message.append(" (");
+                message.append(files.size());
+                message.append(" file(s) changed)"); 
             }
         }
 

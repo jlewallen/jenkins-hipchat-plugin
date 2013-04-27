@@ -157,10 +157,11 @@ public class HipChatNotifier extends Notifier {
         private boolean notifyNotBuilt;
         private boolean notifyUnstable;
         private boolean notifyFailure;
+        private boolean includeChangeDetails;
 
 
         @DataBoundConstructor
-        public HipChatJobProperty(String room, boolean startNotification, boolean notifyAborted, boolean notifyFailure, boolean notifyNotBuilt, boolean notifySuccess, boolean notifyUnstable) {
+        public HipChatJobProperty(String room, boolean startNotification, boolean notifyAborted, boolean notifyFailure, boolean notifyNotBuilt, boolean notifySuccess, boolean notifyUnstable, boolean includeChangeDetails) {
             this.room = room;
             this.startNotification = startNotification;
             this.notifyAborted = notifyAborted;
@@ -168,6 +169,7 @@ public class HipChatNotifier extends Notifier {
             this.notifyNotBuilt = notifyNotBuilt;
             this.notifySuccess = notifySuccess;
             this.notifyUnstable = notifyUnstable;
+            this.includeChangeDetails = includeChangeDetails;
         }
 
         @Exported
@@ -219,6 +221,11 @@ public class HipChatNotifier extends Notifier {
             return notifyUnstable;
         }
 
+        @Exported
+        public boolean getIncludeChangeDetails() {
+            return includeChangeDetails;
+        }
+
         @Extension
         public static final class DescriptorImpl extends JobPropertyDescriptor {
             public String getDisplayName() {
@@ -238,7 +245,8 @@ public class HipChatNotifier extends Notifier {
                         sr.getParameter("hipChatNotifyFailure") != null,
                         sr.getParameter("hipChatNotifyNotBuilt") != null,
                         sr.getParameter("hipChatNotifySuccess") != null,
-                        sr.getParameter("hipChatNotifyUnstable") != null);
+                        sr.getParameter("hipChatNotifyUnstable") != null,
+                        sr.getParameter("hipChatIncludeChangeDetails") != null);
             }
         }
     }
