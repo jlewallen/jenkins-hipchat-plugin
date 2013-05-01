@@ -135,13 +135,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
             }
             
             if (jobProperty.getIncludeChangeDetails()) {
-                message.append("\n<br>Started by changes:");
+                message.append(" Started by changes:");
                 for (Entry entry : entries) {
                     final String commitMsg = entry.getMsg().length() > 45
                                            ? entry.getMsg().substring(0, 45) + "..."
                                            : entry.getMsg();
                     final Integer fileCount = entry.getAffectedFiles().size();
-                    message.append("\n<br>&nbsp;&nbsp;" + commitMsg
+                    message.append("<br>&nbsp;&nbsp;" + commitMsg
                             + " [" + entry.getAuthor().getDisplayName()
                             + " / " + fileCount + " file(s)"
                             + "]");
