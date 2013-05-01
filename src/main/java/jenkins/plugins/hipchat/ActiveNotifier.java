@@ -143,7 +143,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
                     final Integer fileCount = entry.getAffectedFiles().size();
                     message.append("\n<br>&nbsp;&nbsp;" + commitMsg
                             + " [" + entry.getAuthor().getDisplayName()
-                            + " / " + fileCount + " files"
+                            + " / " + fileCount + " file(s)"
                             + "]");
                 }
             } else {
