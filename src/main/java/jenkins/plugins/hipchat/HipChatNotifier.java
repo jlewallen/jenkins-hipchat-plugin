@@ -1,13 +1,16 @@
 package jenkins.plugins.hipchat;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.*;
+import hudson.model.AbstractBuild;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
@@ -76,8 +79,16 @@ public class HipChatNotifier extends Notifier {
         return BuildStepMonitor.BUILD;
     }
 
-    public HipChatService newHipChatService(final String room) {
-        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, getSendAs() == null ? "Build Server" : getSendAs());
+    public HipChatService newHipChatService(String room, AbstractBuild build) {
+        room = (room == null) ? getRoom() : room;
+        String sendAs = StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs();
+
+        // Expand parameters in configuration.
+        EnvVars env = new EnvVars(build.getBuildVariables());
+        String token = env.expand(getAuthToken());
+        room = env.expand(room);
+        sendAs = env.expand(sendAs);
+        return new StandardHipChatService(token, room, sendAs);
     }
 
     @Override
