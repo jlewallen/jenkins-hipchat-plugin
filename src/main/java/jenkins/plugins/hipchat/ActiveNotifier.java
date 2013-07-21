@@ -35,18 +35,25 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     public void started(AbstractBuild build) {
+        MessageBuilder message = new MessageBuilder(notifier, build);
         String changes = getChanges(build);
         CauseAction cause = build.getAction(CauseAction.class);
+        AbstractProject<?, ?> project = build.getProject();
+        String customMessage = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getCustomMessage());
 
         if (changes != null) {
-            notifyStart(build, changes);
+            message.append(changes);
+            message.appendCustomMessage(customMessage, build);
+            notifyStart(build, message.toString());
         } else if (cause != null) {
-            MessageBuilder message = new MessageBuilder(notifier, build);
             message.append(cause.getShortDescription());
-            notifyStart(build, message.appendOpenLink().toString());
+            message.appendOpenLink();
+            message.appendCustomMessage(customMessage, build);
+            notifyStart(build, message.toString());
         } else {
             notifyStart(build, getBuildStatusMessage(build));
         }
+
     }
 
     private void notifyStart(AbstractBuild build, String message) {
@@ -115,10 +122,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     String getBuildStatusMessage(AbstractBuild r) {
+        AbstractProject<?, ?> project = r.getProject();
+        String customMessage = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getCustomMessage());
         MessageBuilder message = new MessageBuilder(notifier, r);
         message.appendStatusMessage();
         message.appendDuration();
-        return message.appendOpenLink().toString();
+        message.appendOpenLink();
+        return message.appendCustomMessage(customMessage, r).toString();
     }
 
     public static class MessageBuilder {
@@ -184,8 +194,26 @@ public class ActiveNotifier implements FineGrainedNotifier {
             return this;
         }
 
+        public MessageBuilder appendCustomMessage(String customMessage, AbstractBuild build) {
+            if (customMessage != null) {
+                message.append("<br />");
+                message.append(getParameterString(customMessage, build));
+            }
+
+            return this;
+        }
+
         public String toString() {
             return message.toString();
+        }
+
+        private String getParameterString(String original, AbstractBuild<?, ?> build) {
+            ParametersAction parameters = build.getAction(ParametersAction.class);
+            if (parameters != null) {
+                original = parameters.substitute(build, original);
+            }
+
+            return original;
         }
     }
 }

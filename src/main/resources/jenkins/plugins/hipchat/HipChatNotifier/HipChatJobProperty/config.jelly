@@ -33,6 +33,10 @@
             <f:checkbox name="hipChatNotifyBackToNormal" value="true" checked="${instance.getNotifyBackToNormal()}"/>
         </f:entry>
 
+        <f:entry title="Custom Message">
+            <f:textbox name="hipChatCustomMessage" value="${instance.getCustomMessage()}"/>
+        </f:entry>
+
     </f:section>
 
 </j:jelly>
