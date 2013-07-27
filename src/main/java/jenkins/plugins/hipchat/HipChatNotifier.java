@@ -144,6 +144,7 @@ public class HipChatNotifier extends Notifier {
         private boolean notifyUnstable;
         private boolean notifyFailure;
         private boolean notifyBackToNormal;
+        private String conditionalNotify;
         private String customMessage;
 
         @DataBoundConstructor
@@ -155,6 +156,7 @@ public class HipChatNotifier extends Notifier {
                                   boolean notifySuccess,
                                   boolean notifyUnstable,
                                   boolean notifyBackToNormal,
+                                  String conditionalNotify,
                                   String customMessage) {
             this.room = room;
             this.startNotification = startNotification;
@@ -164,6 +166,7 @@ public class HipChatNotifier extends Notifier {
             this.notifySuccess = notifySuccess;
             this.notifyUnstable = notifyUnstable;
             this.notifyBackToNormal = notifyBackToNormal;
+            this.conditionalNotify = conditionalNotify;
             this.customMessage = customMessage;
         }
 
@@ -222,6 +225,11 @@ public class HipChatNotifier extends Notifier {
         }
 
         @Exported
+        public String getConditionalNotify() {
+            return conditionalNotify;
+        }
+
+        @Exported
         public String getCustomMessage() {
             return customMessage;
         }
@@ -247,6 +255,7 @@ public class HipChatNotifier extends Notifier {
                         sr.getParameter("hipChatNotifySuccess") != null,
                         sr.getParameter("hipChatNotifyUnstable") != null,
                         sr.getParameter("hipChatNotifyBackToNormal") != null,
+                        sr.getParameter("hipChatConditionalNotify"),
                         sr.getParameter("hipChatCustomMessage"));
             }
         }

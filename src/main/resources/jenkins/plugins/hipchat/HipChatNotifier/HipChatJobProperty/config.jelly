@@ -33,7 +33,11 @@
             <f:checkbox name="hipChatNotifyBackToNormal" value="true" checked="${instance.getNotifyBackToNormal()}"/>
         </f:entry>
 
-        <f:entry title="Custom Message">
+        <f:entry title="Conditional Notify" help="${rootURL}/plugin/hipchat/help-config-hipChatConditionalNotify.html">
+            <f:textbox name="hipChatConditionalNotify" value="${instance.getConditionalNotify()}"/>
+        </f:entry>
+
+        <f:entry title="Custom Message" help="${rootURL}/plugin/hipchat/help-config-hipChatCustomMessage.html">
             <f:textbox name="hipChatCustomMessage" value="${instance.getCustomMessage()}"/>
         </f:entry>
 
