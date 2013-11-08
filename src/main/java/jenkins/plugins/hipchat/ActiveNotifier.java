@@ -89,7 +89,17 @@ public class ActiveNotifier implements FineGrainedNotifier {
         message.append(" (");
         message.append(files.size());
         message.append(" file(s) changed)");
-        return message.appendOpenLink().toString();
+        return message.toString();
+    }
+
+    String getCulprits(AbstractBuild r) {
+        Set<User> culprits = r.getCulprits();
+        Set<String> culpritNames = new HashSet<String>();
+        for (User culprit : culprits) {
+            culpritNames.add(culprit.getFullName());
+        }
+
+        return "Who's to blame? " + StringUtils.join(culpritNames, ", ");
     }
 
     static String getBuildColor(AbstractBuild r) {
@@ -110,16 +120,21 @@ public class ActiveNotifier implements FineGrainedNotifier {
         String customMessage = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getCustomMessage());
         MessageBuilder message = new MessageBuilder(notifier, build);
 
+        message.appendOpenLink().append("<br />");
         message.appendStatusMessage();
         if (!build.isBuilding()) message.appendDuration();
 
         if (changes != null) {
+            message.append("<br />");
             message.append(changes);
         } else if (cause != null) {
+            message.append("<br />");
             message.append(cause.getShortDescription());
-            message.appendOpenLink();
-        } else {
-            message.appendOpenLink();
+        }
+
+        if (build.getResult() == Result.FAILURE) {
+            message.append("<br />");
+            message.append(getCulprits(build));
         }
 
         return message.appendCustomMessage(customMessage, build).toString();
