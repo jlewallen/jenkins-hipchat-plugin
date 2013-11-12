@@ -99,7 +99,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             culpritNames.add(culprit.getFullName());
         }
 
-        return "Who's to blame? " + StringUtils.join(culpritNames, ", ");
+        return "Committers since last Success: " + StringUtils.join(culpritNames, ", ");
     }
 
     static String getBuildColor(AbstractBuild r) {
