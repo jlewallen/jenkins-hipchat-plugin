@@ -32,19 +32,19 @@ public class HipChatNotifier extends Notifier {
     }
 
     public String getRoom() {
-        return room;
+        return this.room;
     }
 
     public String getAuthToken() {
-        return authToken;
+        return this.authToken;
     }
 
     public String getBuildServerUrl() {
-        return buildServerUrl;
+        return this.buildServerUrl;
     }
 
     public String getSendAs() {
-        return sendAs;
+        return this.sendAs;
     }
 
     public void setBuildServerUrl(final String buildServerUrl) {
