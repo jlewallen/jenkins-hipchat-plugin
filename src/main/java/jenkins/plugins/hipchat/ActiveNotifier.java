@@ -70,6 +70,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
+
+	if ((result == Result.FAILURE || result == Result.UNSTABLE) && jobProperty.getMentionAll()) {
+            getHipChat(r).publish("@all " + r.getProject().getDisplayName() +  " failed. Fix it ASAP!!! Stop pushing until it comes back to normal!!!.", "red", "text");
+        }
     }
 
     String getChanges(AbstractBuild r) {
