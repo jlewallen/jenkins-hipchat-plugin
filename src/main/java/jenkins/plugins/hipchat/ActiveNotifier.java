@@ -9,6 +9,11 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 
 import hudson.Util;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.CauseAction;
+import hudson.model.Result;
+import hudson.model.Run;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.AffectedFile;
 import hudson.scm.ChangeLogSet.Entry;
