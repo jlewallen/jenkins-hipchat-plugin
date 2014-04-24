@@ -34,8 +34,7 @@ public class ActiveNotifier implements FineGrainedNotifier
     private HipChatService getHipChat(AbstractBuild r) {
         AbstractProject<?, ?> project = r.getProject();
         String projectRoom = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getRoom());
-        String projectServer = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getServer());
-        return notifier.newHipChatService(projectRoom, projectServer);
+        return notifier.newHipChatService(projectRoom);
     }
 
     public void deleted(AbstractBuild r) {
