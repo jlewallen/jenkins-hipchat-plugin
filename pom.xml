@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- change to this parent to compare building this plugin for Hudson -->
-	<!--
+    <!--
     <parent>
-		<groupId>org.jvnet.hudson.plugins</groupId>
-		<artifactId>hudson-plugin-parent</artifactId>
-		<version>2.0.0</version>
-	</parent>
-	-->
+        <groupId>org.jvnet.hudson.plugins</groupId>
+        <artifactId>hudson-plugin-parent</artifactId>
+        <version>2.0.0</version>
+    </parent>
+    -->
 
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
@@ -19,11 +19,11 @@
 
     <!-- keeping original groupId -->
     <groupId>org.jvnet.hudson.plugins</groupId>
-	<artifactId>hipchat</artifactId>
-	<packaging>hpi</packaging>
-	<version>0.1.5-SNAPSHOT</version>
-	<name>Jenkins HipChat Plugin</name>
-	<description>A Build status publisher that notifies channels on a HipChat server</description>
+    <artifactId>hipchat</artifactId>
+    <packaging>hpi</packaging>
+    <version>0.1.5-SNAPSHOT</version>
+    <name>Jenkins HipChat Plugin</name>
+    <description>A Build status publisher that notifies channels on a HipChat server</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/HipChat+Plugin</url>
 
     <properties>
@@ -32,11 +32,11 @@
     </properties>
 
     <licenses>
-		<license>
-			<name>MIT license</name>
-			<comments>All source code is under the MIT license.</comments>
-		</license>
-	</licenses>
+        <license>
+            <name>MIT license</name>
+            <comments>All source code is under the MIT license.</comments>
+        </license>
+    </licenses>
 
     <distributionManagement>
         <repository>
@@ -51,12 +51,12 @@
         <url>https://github.com/jlewallen/jenkins-hipchat-plugin</url>
     </scm>
 
-	<dependencies>
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -83,11 +83,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                   <groupId>org.jenkins-ci.tools</groupId>
-                   <artifactId>maven-hpi-plugin</artifactId>
-                   <configuration>
-                       <disabledTestInjection>true</disabledTestInjection>
-                   </configuration>
+                    <groupId>org.jenkins-ci.tools</groupId>
+                    <artifactId>maven-hpi-plugin</artifactId>
+                    <configuration>
+                        <disabledTestInjection>true</disabledTestInjection>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

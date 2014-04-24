@@ -1,16 +1,17 @@
 package jenkins.plugins.hipchat;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import jenkins.model.Jenkins;
 import hudson.ProxyConfiguration;
+import jenkins.model.Jenkins;
 
-public class StandardHipChatService implements HipChatService {
+public class StandardHipChatService implements HipChatService
+{
 
     private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
 
@@ -24,6 +25,11 @@ public class StandardHipChatService implements HipChatService {
         this.token = token;
         this.roomIds = roomId.split(",");
         this.from = from;
+    }
+
+    public StandardHipChatService(String token, String roomId, String from, String host) {
+        this(token, roomId, from);
+        this.host = host;
     }
 
     public void publish(String message) {
@@ -46,7 +52,7 @@ public class StandardHipChatService implements HipChatService {
                 post.getParams().setContentCharset("UTF-8");
                 int responseCode = client.executeMethod(post);
                 String response = post.getResponseBodyAsString();
-                if(responseCode != HttpStatus.SC_OK || ! response.contains("\"sent\"")) {
+                if (responseCode != HttpStatus.SC_OK || !response.contains("\"sent\"")) {
                     logger.log(Level.WARNING, "HipChat post may have failed. Response: " + response);
                 }
             } catch (Exception e) {
@@ -56,7 +62,7 @@ public class StandardHipChatService implements HipChatService {
             }
         }
     }
-    
+
     private HttpClient getHttpClient() {
         HttpClient client = new HttpClient();
         if (Jenkins.getInstance() != null) {
