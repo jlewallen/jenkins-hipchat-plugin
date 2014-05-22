@@ -59,7 +59,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
+        return BuildStepMonitor.NONE;
     }
 
     public HipChatService newHipChatService(final String room) {
