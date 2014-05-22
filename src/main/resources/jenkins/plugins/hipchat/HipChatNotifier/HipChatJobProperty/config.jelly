@@ -29,6 +29,10 @@
             <f:checkbox name="hipChatNotifyUnstable" value="true" checked="${instance.getNotifyUnstable()}"/>
         </f:entry>
 
+        <f:entry title="Notify Back To Normal">
+            <f:checkbox name="hipChatNotifyBackToNormal" value="true" checked="${instance.getNotifyBackToNormal()}"/>
+        </f:entry>
+
     </f:section>
 
 </j:jelly>

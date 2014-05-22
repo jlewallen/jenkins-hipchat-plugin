@@ -1,10 +1,14 @@
 package jenkins.plugins.hipchat;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import jenkins.model.Jenkins;
+import hudson.ProxyConfiguration;
 
 public class StandardHipChatService implements HipChatService {
 
@@ -29,7 +33,7 @@ public class StandardHipChatService implements HipChatService {
     public void publish(String message, String color) {
         for (String roomId : roomIds) {
             logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
-            HttpClient client = new HttpClient();
+            HttpClient client = getHttpClient();
             String url = "https://" + host + "/v1/rooms/message?auth_token=" + token;
             PostMethod post = new PostMethod(url);
 
@@ -40,13 +44,28 @@ public class StandardHipChatService implements HipChatService {
                 post.addParameter("color", color);
                 post.addParameter("notify", shouldNotify(color));
                 post.getParams().setContentCharset("UTF-8");
-                client.executeMethod(post);
+                int responseCode = client.executeMethod(post);
+                String response = post.getResponseBodyAsString();
+                if(responseCode != HttpStatus.SC_OK || ! response.contains("\"sent\"")) {
+                    logger.log(Level.WARNING, "HipChat post may have failed. Response: " + response);
+                }
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error posting to HipChat", e);
             } finally {
                 post.releaseConnection();
             }
         }
+    }
+    
+    private HttpClient getHttpClient() {
+        HttpClient client = new HttpClient();
+        if (Jenkins.getInstance() != null) {
+            ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+            if (proxy != null) {
+                client.getHostConfiguration().setProxy(proxy.name, proxy.port);
+            }
+        }
+        return client;
     }
 
     private String shouldNotify(String color) {
