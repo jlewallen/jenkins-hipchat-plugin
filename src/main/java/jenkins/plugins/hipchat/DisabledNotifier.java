@@ -3,7 +3,9 @@ package jenkins.plugins.hipchat;
 import hudson.model.AbstractBuild;
 
 @SuppressWarnings("rawtypes")
-public class DisabledNotifier implements FineGrainedNotifier {
+public class DisabledNotifier implements FineGrainedNotifier
+{
+
     public void started(AbstractBuild r) {
     }
 

@@ -1,20 +1,26 @@
 package jenkins.plugins.hipchat;
 
-import hudson.Util;
-import hudson.model.*;
-import hudson.scm.ChangeLogSet;
-import hudson.scm.ChangeLogSet.AffectedFile;
-import hudson.scm.ChangeLogSet.Entry;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
+
+import hudson.Util;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.CauseAction;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.scm.ChangeLogSet;
+import hudson.scm.ChangeLogSet.AffectedFile;
+import hudson.scm.ChangeLogSet.Entry;
+
 @SuppressWarnings("rawtypes")
-public class ActiveNotifier implements FineGrainedNotifier {
+public class ActiveNotifier implements FineGrainedNotifier
+{
 
     private static final Logger logger = Logger.getLogger(HipChatListener.class.getName());
 
@@ -81,7 +87,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         List<Entry> entries = new LinkedList<Entry>();
         Set<AffectedFile> files = new HashSet<AffectedFile>();
         for (Object o : changeSet.getItems()) {
-            Entry entry = (Entry) o;
+            Entry entry = (Entry)o;
             logger.info("Entry " + o);
             entries.add(entry);
             files.addAll(entry.getAffectedFiles());
@@ -121,7 +127,9 @@ public class ActiveNotifier implements FineGrainedNotifier {
         return message.appendOpenLink().toString();
     }
 
-    public static class MessageBuilder {
+    public static class MessageBuilder
+    {
+
         private StringBuffer message;
         private HipChatNotifier notifier;
         private AbstractBuild build;
@@ -145,12 +153,24 @@ public class ActiveNotifier implements FineGrainedNotifier {
             Result result = r.getResult();
             Run previousBuild = r.getProject().getLastBuild().getPreviousBuild();
             Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
-            if (result == Result.SUCCESS && previousResult == Result.FAILURE) return "Back to normal";
-            if (result == Result.SUCCESS) return "Success";
-            if (result == Result.FAILURE) return "<b>FAILURE</b>";
-            if (result == Result.ABORTED) return "ABORTED";
-            if (result == Result.NOT_BUILT) return "Not built";
-            if (result == Result.UNSTABLE) return "Unstable";
+            if (result == Result.SUCCESS && previousResult == Result.FAILURE) {
+                return "Back to normal";
+            }
+            if (result == Result.SUCCESS) {
+                return "Success";
+            }
+            if (result == Result.FAILURE) {
+                return "<b>FAILURE</b>";
+            }
+            if (result == Result.ABORTED) {
+                return "ABORTED";
+            }
+            if (result == Result.NOT_BUILT) {
+                return "Not built";
+            }
+            if (result == Result.UNSTABLE) {
+                return "Unstable";
+            }
             return "Unknown";
         }
 

@@ -1,5 +1,8 @@
 package jenkins.plugins.hipchat;
 
+import java.util.Map;
+import java.util.logging.Logger;
+
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -8,12 +11,10 @@ import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 import hudson.tasks.Publisher;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
 @Extension
 @SuppressWarnings("rawtypes")
-public class HipChatListener extends RunListener<AbstractBuild> {
+public class HipChatListener extends RunListener<AbstractBuild>
+{
 
     private static final Logger logger = Logger.getLogger(HipChatListener.class.getName());
 
@@ -50,7 +51,7 @@ public class HipChatListener extends RunListener<AbstractBuild> {
         Map<Descriptor<Publisher>, Publisher> map = project.getPublishersList().toMap();
         for (Publisher publisher : map.values()) {
             if (publisher instanceof HipChatNotifier) {
-                return new ActiveNotifier((HipChatNotifier) publisher);
+                return new ActiveNotifier((HipChatNotifier)publisher);
             }
         }
         return new DisabledNotifier();
