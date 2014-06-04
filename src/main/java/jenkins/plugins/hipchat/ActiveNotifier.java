@@ -84,7 +84,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
             Entry entry = (Entry) o;
             logger.info("Entry " + o);
             entries.add(entry);
-            files.addAll(entry.getAffectedFiles());
+            try{
+            	files.addAll(entry.getAffectedFiles());
+            } catch (UnsupportedOperationException e){
+            	logger.info(e.getMessage());
+            	return null;
+            }
         }
         if (entries.isEmpty()) {
             logger.info("Empty change...");
