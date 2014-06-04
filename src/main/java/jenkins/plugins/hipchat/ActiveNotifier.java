@@ -84,7 +84,15 @@ public class ActiveNotifier implements FineGrainedNotifier {
             Entry entry = (Entry) o;
             logger.info("Entry " + o);
             entries.add(entry);
-            files.addAll(entry.getAffectedFiles());
+            try {
+            	//getAffectedFiles() can return UnsupportedOperationException if the SCM do not implement the interface (TFS does not)
+            	files.addAll(entry.getAffectedFiles());
+            } catch (UnsupportedOperationException e){
+            	//return null if SCM doe snot support getAffectedFiles()
+            	logger.info(e.getMessage());
+            	return null;
+            }
+            
         }
         if (entries.isEmpty()) {
             logger.info("Empty change...");
