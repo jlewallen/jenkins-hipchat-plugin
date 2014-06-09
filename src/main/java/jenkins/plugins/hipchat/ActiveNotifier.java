@@ -165,7 +165,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
 
         private MessageBuilder startMessage() {
-            message.append(build.getProject().getDisplayName());
+            message.append(build.getProject().getFullDisplayName());
             message.append(" - ");
             message.append(build.getDisplayName());
             message.append(" ");
