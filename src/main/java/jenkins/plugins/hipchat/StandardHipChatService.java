@@ -14,14 +14,15 @@ public class StandardHipChatService implements HipChatService {
 
     private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
 
-    private String host = "api.hipchat.com";
+    private String host;
     private String token;
     private String[] roomIds;
     private String from;
 
-    public StandardHipChatService(String token, String roomId, String from) {
+    public StandardHipChatService(String token, String roomId, String from, String hipChatHost) {
         super();
         this.token = token;
+        this.host = hipChatHost;
         this.roomIds = roomId.split(",");
         this.from = from;
     }
@@ -56,7 +57,7 @@ public class StandardHipChatService implements HipChatService {
             }
         }
     }
-    
+
     private HttpClient getHttpClient() {
         HttpClient client = new HttpClient();
         if (Jenkins.getInstance() != null) {
