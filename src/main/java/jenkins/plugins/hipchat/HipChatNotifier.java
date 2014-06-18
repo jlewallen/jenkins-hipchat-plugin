@@ -144,7 +144,8 @@ public class HipChatNotifier extends Notifier {
         private boolean notifyUnstable;
         private boolean notifyFailure;
         private boolean notifyBackToNormal;
-
+        private String conditionalNotify;
+        private String customMessage;
 
         @DataBoundConstructor
         public HipChatJobProperty(String room,
@@ -154,7 +155,9 @@ public class HipChatNotifier extends Notifier {
                                   boolean notifyNotBuilt,
                                   boolean notifySuccess,
                                   boolean notifyUnstable,
-                                  boolean notifyBackToNormal) {
+                                  boolean notifyBackToNormal,
+                                  String conditionalNotify,
+                                  String customMessage) {
             this.room = room;
             this.startNotification = startNotification;
             this.notifyAborted = notifyAborted;
@@ -163,6 +166,8 @@ public class HipChatNotifier extends Notifier {
             this.notifySuccess = notifySuccess;
             this.notifyUnstable = notifyUnstable;
             this.notifyBackToNormal = notifyBackToNormal;
+            this.conditionalNotify = conditionalNotify;
+            this.customMessage = customMessage;
         }
 
         @Exported
@@ -219,6 +224,16 @@ public class HipChatNotifier extends Notifier {
             return notifyBackToNormal;
         }
 
+        @Exported
+        public String getConditionalNotify() {
+            return conditionalNotify;
+        }
+
+        @Exported
+        public String getCustomMessage() {
+            return customMessage;
+        }
+
         @Extension
         public static final class DescriptorImpl extends JobPropertyDescriptor {
             public String getDisplayName() {
@@ -239,7 +254,9 @@ public class HipChatNotifier extends Notifier {
                         sr.getParameter("hipChatNotifyNotBuilt") != null,
                         sr.getParameter("hipChatNotifySuccess") != null,
                         sr.getParameter("hipChatNotifyUnstable") != null,
-                        sr.getParameter("hipChatNotifyBackToNormal") != null);
+                        sr.getParameter("hipChatNotifyBackToNormal") != null,
+                        sr.getParameter("hipChatConditionalNotify"),
+                        sr.getParameter("hipChatCustomMessage"));
             }
         }
     }

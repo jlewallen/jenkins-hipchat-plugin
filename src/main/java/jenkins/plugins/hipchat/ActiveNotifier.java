@@ -35,22 +35,11 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     public void started(AbstractBuild build) {
-        String changes = getChanges(build);
-        CauseAction cause = build.getAction(CauseAction.class);
-
-        if (changes != null) {
-            notifyStart(build, changes);
-        } else if (cause != null) {
-            MessageBuilder message = new MessageBuilder(notifier, build);
-            message.append(cause.getShortDescription());
-            notifyStart(build, message.appendOpenLink().toString());
-        } else {
-            notifyStart(build, getBuildStatusMessage(build));
+        AbstractProject<?, ?> project = build.getProject();
+        HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
+        if (MessageBuilder.shouldNotify(jobProperty.getStartNotification(), jobProperty.getConditionalNotify(), build)) {
+            getHipChat(build).publish(getBuildStatusMessage(build), "green");
         }
-    }
-
-    private void notifyStart(AbstractBuild build, String message) {
-        getHipChat(build).publish(message, "green");
     }
 
     public void finalized(AbstractBuild r) {
@@ -62,12 +51,12 @@ public class ActiveNotifier implements FineGrainedNotifier {
         Result result = r.getResult();
         AbstractBuild<?, ?> previousBuild = project.getLastBuild().getPreviousBuild();
         Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
-        if ((result == Result.ABORTED && jobProperty.getNotifyAborted())
-                || (result == Result.FAILURE && jobProperty.getNotifyFailure())
-                || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
-                || (result == Result.SUCCESS && previousResult == Result.FAILURE && jobProperty.getNotifyBackToNormal())
-                || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
-                || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
+        if ((result == Result.ABORTED && MessageBuilder.shouldNotify(jobProperty.getNotifyAborted(), jobProperty.getConditionalNotify(), r))
+                || (result == Result.FAILURE && MessageBuilder.shouldNotify(jobProperty.getNotifyFailure(), jobProperty.getConditionalNotify(), r))
+                || (result == Result.NOT_BUILT && MessageBuilder.shouldNotify(jobProperty.getNotifyNotBuilt(), jobProperty.getConditionalNotify(), r))
+                || (result == Result.SUCCESS && previousResult == Result.FAILURE && MessageBuilder.shouldNotify(jobProperty.getNotifyBackToNormal(), jobProperty.getConditionalNotify(), r))
+                || (result == Result.SUCCESS && MessageBuilder.shouldNotify(jobProperty.getNotifySuccess(), jobProperty.getConditionalNotify(), r))
+                || (result == Result.UNSTABLE && MessageBuilder.shouldNotify(jobProperty.getNotifyUnstable(), jobProperty.getConditionalNotify(), r))) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
     }
@@ -100,7 +89,17 @@ public class ActiveNotifier implements FineGrainedNotifier {
         message.append(" (");
         message.append(files.size());
         message.append(" file(s) changed)");
-        return message.appendOpenLink().toString();
+        return message.toString();
+    }
+
+    String getCulprits(AbstractBuild r) {
+        Set<User> culprits = r.getCulprits();
+        Set<String> culpritNames = new HashSet<String>();
+        for (User culprit : culprits) {
+            culpritNames.add(culprit.getFullName());
+        }
+
+        return "Committers since last Success: " + StringUtils.join(culpritNames, ", ");
     }
 
     static String getBuildColor(AbstractBuild r) {
@@ -114,11 +113,31 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
     }
 
-    String getBuildStatusMessage(AbstractBuild r) {
-        MessageBuilder message = new MessageBuilder(notifier, r);
+    String getBuildStatusMessage(AbstractBuild build) {
+        String changes = getChanges(build);
+        CauseAction cause = build.getAction(CauseAction.class);
+        AbstractProject<?, ?> project = build.getProject();
+        String customMessage = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getCustomMessage());
+        MessageBuilder message = new MessageBuilder(notifier, build);
+
+        message.appendOpenLink().append("<br />");
         message.appendStatusMessage();
-        message.appendDuration();
-        return message.appendOpenLink().toString();
+        if (!build.isBuilding()) message.appendDuration();
+
+        if (changes != null) {
+            message.append("<br />");
+            message.append(changes);
+        } else if (cause != null) {
+            message.append("<br />");
+            message.append(cause.getShortDescription());
+        }
+
+        if (build.getResult() == Result.FAILURE) {
+            message.append("<br />");
+            message.append(getCulprits(build));
+        }
+
+        return message.appendCustomMessage(customMessage, build).toString();
     }
 
     public static class MessageBuilder {
@@ -134,6 +153,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
 
         public MessageBuilder appendStatusMessage() {
+            message.append("Build status: ");
             message.append(getStatusMessage(build));
             return this;
         }
@@ -184,8 +204,35 @@ public class ActiveNotifier implements FineGrainedNotifier {
             return this;
         }
 
+        public MessageBuilder appendCustomMessage(String customMessage, AbstractBuild build) {
+            if (customMessage != null) {
+                message.append("<br />");
+                message.append(getParameterString(customMessage, build));
+            }
+
+            return this;
+        }
+
         public String toString() {
             return message.toString();
+        }
+
+        public static boolean shouldNotify(boolean jobNotifyProperty, String conditionalProperty, AbstractBuild r) {
+            boolean blnConditionalProperty = true;
+            conditionalProperty = MessageBuilder.getParameterString(conditionalProperty, r);
+            if (conditionalProperty.equalsIgnoreCase("true") || conditionalProperty.equalsIgnoreCase("false")) {
+                blnConditionalProperty = Boolean.valueOf(conditionalProperty);
+            }
+            return jobNotifyProperty && blnConditionalProperty;
+        }
+
+        public static String getParameterString(String original, AbstractBuild<?, ?> r) {
+            ParametersAction parameters = r.getAction(ParametersAction.class);
+            if (parameters != null) {
+                original = parameters.substitute(r, original);
+            }
+
+            return original;
         }
     }
 }
