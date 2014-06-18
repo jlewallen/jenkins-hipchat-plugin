@@ -25,6 +25,7 @@ public class HipChatNotifier extends Notifier {
     private String authToken;
     private String buildServerUrl;
     private String room;
+    private String hipChatHost;
     private String sendAs;
 
     @Override
@@ -34,6 +35,10 @@ public class HipChatNotifier extends Notifier {
 
     public String getRoom() {
         return room;
+    }
+
+    public String getHipChatHost() {
+        return hipChatHost;
     }
 
     public String getAuthToken() {
@@ -50,12 +55,13 @@ public class HipChatNotifier extends Notifier {
 
 
     @DataBoundConstructor
-    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs) {
+    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs, final String hipChatHost) {
         super();
         this.authToken = authToken;
         this.buildServerUrl = buildServerUrl;
         this.room = room;
         this.sendAs = sendAs;
+        this.hipChatHost = hipChatHost;
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -63,7 +69,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public HipChatService newHipChatService(final String room) {
-        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
+        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs(), getHipChatHost());
     }
 
     @Override
@@ -77,6 +83,7 @@ public class HipChatNotifier extends Notifier {
         private String room;
         private String buildServerUrl;
         private String sendAs;
+        private String hipChatHost;
 
         public DescriptorImpl() {
             load();
@@ -88,6 +95,10 @@ public class HipChatNotifier extends Notifier {
 
         public String getRoom() {
             return room;
+        }
+
+        public String getHipChatHost() {
+            return hipChatHost;
         }
 
         public String getBuildServerUrl() {
@@ -107,8 +118,17 @@ public class HipChatNotifier extends Notifier {
             if (token == null) token = sr.getParameter("hipChatToken");
             if (buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             if (room == null) room = sr.getParameter("hipChatRoom");
+            establishHipChatHost(sr);
             if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
-            return new HipChatNotifier(token, room, buildServerUrl, sendAs);
+            return new HipChatNotifier(token, room, buildServerUrl, sendAs, hipChatHost);
+        }
+
+        protected void establishHipChatHost(StaplerRequest sr) {
+            if (null == hipChatHost) {
+                hipChatHost = sr.getParameter("hipChatHost");
+            } else {
+                hipChatHost = HipChatJobProperty.DEFAULT_HIPCHAT_HOST;
+            }
         }
 
         @Override
@@ -120,8 +140,9 @@ public class HipChatNotifier extends Notifier {
             if (buildServerUrl != null && !buildServerUrl.endsWith("/")) {
                 buildServerUrl = buildServerUrl + "/";
             }
+            establishHipChatHost(sr);
             try {
-                new HipChatNotifier(token, room, buildServerUrl, sendAs);
+                new HipChatNotifier(token, room, buildServerUrl, sendAs, hipChatHost);
             } catch (Exception e) {
                 throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
             }
@@ -136,7 +157,12 @@ public class HipChatNotifier extends Notifier {
     }
 
     public static class HipChatJobProperty extends hudson.model.JobProperty<AbstractProject<?, ?>> {
+
+        public static final String DEFAULT_HIPCHAT_HOST = "api.hipchat.com";
+
         private String room;
+        private String  hipChatHost;
+
         private boolean startNotification;
         private boolean notifySuccess;
         private boolean notifyAborted;
@@ -145,9 +171,9 @@ public class HipChatNotifier extends Notifier {
         private boolean notifyFailure;
         private boolean notifyBackToNormal;
 
-
         @DataBoundConstructor
         public HipChatJobProperty(String room,
+                                  String hipChatHost,
                                   boolean startNotification,
                                   boolean notifyAborted,
                                   boolean notifyFailure,
@@ -156,6 +182,10 @@ public class HipChatNotifier extends Notifier {
                                   boolean notifyUnstable,
                                   boolean notifyBackToNormal) {
             this.room = room;
+            this.hipChatHost = hipChatHost;
+            if (null == this.hipChatHost) {
+                this.hipChatHost = DEFAULT_HIPCHAT_HOST;
+            }
             this.startNotification = startNotification;
             this.notifyAborted = notifyAborted;
             this.notifyFailure = notifyFailure;
@@ -168,6 +198,11 @@ public class HipChatNotifier extends Notifier {
         @Exported
         public String getRoom() {
             return room;
+        }
+
+        @Exported
+        public String getHipChatHost() {
+            return hipChatHost;
         }
 
         @Exported
@@ -233,6 +268,7 @@ public class HipChatNotifier extends Notifier {
             @Override
             public HipChatJobProperty newInstance(StaplerRequest sr, JSONObject formData) throws hudson.model.Descriptor.FormException {
                 return new HipChatJobProperty(sr.getParameter("hipChatProjectRoom"),
+                        sr.getParameter("hipChatProjectRoom"),
                         sr.getParameter("hipChatStartNotification") != null,
                         sr.getParameter("hipChatNotifyAborted") != null,
                         sr.getParameter("hipChatNotifyFailure") != null,
