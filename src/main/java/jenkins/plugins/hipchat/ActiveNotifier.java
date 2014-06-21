@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @SuppressWarnings("rawtypes")
@@ -35,15 +36,18 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     public void started(AbstractBuild build) {
-        String changes = getChanges(build);
+        MessageBuilder message = new MessageBuilder(notifier, build);
+
+        boolean hasChangeSet = getChanges(build, message);
+        appendBuildParams(build, message);
         CauseAction cause = build.getAction(CauseAction.class);
 
-        if (changes != null) {
-            notifyStart(build, changes);
+        if (hasChangeSet == true) {
+            notifyStart(build, message.toString());
         } else if (cause != null) {
-            MessageBuilder message = new MessageBuilder(notifier, build);
             message.append(cause.getShortDescription());
-            notifyStart(build, message.appendOpenLink().toString());
+            message.appendOpenLink();
+            notifyStart(build, message.toString());
         } else {
             notifyStart(build, getBuildStatusMessage(build));
         }
@@ -72,10 +76,27 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
     }
 
-    String getChanges(AbstractBuild r) {
+    void appendBuildParams(AbstractBuild r, MessageBuilder message){
+        Map<String,String> buildParams = r.getBuildVariables();
+        if (buildParams == null) {
+            logger.info("No build paramters to display...");
+            return;
+        }
+        String delim = "";
+        for (Map.Entry<String, String> entry : buildParams.entrySet()) {
+            message.append(entry.getKey());
+            message.append("=");
+            message.append(entry.getValue());
+            message.append(delim);
+            delim = ", ";
+        }
+        message.append("<br>");
+    }
+
+    boolean getChanges(AbstractBuild r, MessageBuilder message) {
         if (!r.hasChangeSetComputed()) {
             logger.info("No change set computed...");
-            return null;
+            return false;
         }
         ChangeLogSet changeSet = r.getChangeSet();
         List<Entry> entries = new LinkedList<Entry>();
@@ -88,19 +109,20 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
         if (entries.isEmpty()) {
             logger.info("Empty change...");
-            return null;
+            return false;
+
         }
         Set<String> authors = new HashSet<String>();
         for (Entry entry : entries) {
             authors.add(entry.getAuthor().getDisplayName());
         }
-        MessageBuilder message = new MessageBuilder(notifier, r);
         message.append("Started by changes from ");
         message.append(StringUtils.join(authors, ", "));
         message.append(" (");
         message.append(files.size());
         message.append(" file(s) changed)");
-        return message.appendOpenLink().toString();
+        message.appendOpenLink();
+        return true;
     }
 
     static String getBuildColor(AbstractBuild r) {
@@ -118,7 +140,8 @@ public class ActiveNotifier implements FineGrainedNotifier {
         MessageBuilder message = new MessageBuilder(notifier, r);
         message.appendStatusMessage();
         message.appendDuration();
-        return message.appendOpenLink().toString();
+        message.appendOpenLink();
+        return message.toString();
     }
 
     public static class MessageBuilder {
@@ -172,10 +195,9 @@ public class ActiveNotifier implements FineGrainedNotifier {
             return this;
         }
 
-        public MessageBuilder appendOpenLink() {
+        public void appendOpenLink() {
             String url = notifier.getBuildServerUrl() + build.getUrl();
             message.append(" (<a href='").append(url).append("'>Open</a>)");
-            return this;
         }
 
         public MessageBuilder appendDuration() {
