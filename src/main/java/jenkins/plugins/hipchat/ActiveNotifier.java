@@ -1,5 +1,6 @@
 package jenkins.plugins.hipchat;
 
+import hudson.EnvVars;
 import hudson.Util;
 import hudson.model.*;
 import hudson.scm.ChangeLogSet;
@@ -168,6 +169,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
             message.append(build.getProject().getDisplayName());
             message.append(" - ");
             message.append(build.getDisplayName());
+            EnvVars env = new EnvVars(build.getBuildVariables());
+            String hipchatMsg = env.get("HIPCHAT_MSG");
+            if (hipchatMsg != null && !hipchatMsg.isEmpty()) {
+                message.append(" - ");
+                message.append(hipchatMsg);
+                message.append(" - ");
+            }
             message.append(" ");
             return this;
         }
