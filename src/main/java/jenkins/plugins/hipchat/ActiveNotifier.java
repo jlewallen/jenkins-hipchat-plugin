@@ -65,7 +65,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         if ((result == Result.ABORTED && jobProperty.getNotifyAborted())
                 || (result == Result.FAILURE && jobProperty.getNotifyFailure())
                 || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
-                || (result == Result.SUCCESS && previousResult == Result.FAILURE && jobProperty.getNotifyBackToNormal())
+                || (result == Result.SUCCESS && (previousResult == Result.FAILURE || previousResult == Result.UNSTABLE) && jobProperty.getNotifyBackToNormal())
                 || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
@@ -145,7 +145,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             Result result = r.getResult();
             Run previousBuild = r.getProject().getLastBuild().getPreviousBuild();
             Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
-            if (result == Result.SUCCESS && previousResult == Result.FAILURE) return "Back to normal";
+            if (result == Result.SUCCESS && (previousResult == Result.FAILURE || previousResult == Result.UNSTABLE)) return "Back to normal";
             if (result == Result.SUCCESS) return "Success";
             if (result == Result.FAILURE) return "<b>FAILURE</b>";
             if (result == Result.ABORTED) return "ABORTED";
