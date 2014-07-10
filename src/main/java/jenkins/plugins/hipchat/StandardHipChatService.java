@@ -27,10 +27,14 @@ public class StandardHipChatService implements HipChatService {
     }
 
     public void publish(String message) {
-        publish(message, "yellow");
+        publish(message, "yellow", "html");
     }
 
     public void publish(String message, String color) {
+        publish(message, color, "html");
+    }
+
+    public void publish(String message, String color, String format) {
         for (String roomId : roomIds) {
             logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
             HttpClient client = getHttpClient();
@@ -43,6 +47,7 @@ public class StandardHipChatService implements HipChatService {
                 post.addParameter("message", message);
                 post.addParameter("color", color);
                 post.addParameter("notify", shouldNotify(color));
+                post.addParameter("message_format", format);
                 post.getParams().setContentCharset("UTF-8");
                 int responseCode = client.executeMethod(post);
                 String response = post.getResponseBodyAsString();
@@ -56,7 +61,7 @@ public class StandardHipChatService implements HipChatService {
             }
         }
     }
-    
+
     private HttpClient getHttpClient() {
         HttpClient client = new HttpClient();
         if (Jenkins.getInstance() != null) {

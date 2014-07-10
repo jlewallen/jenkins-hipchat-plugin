@@ -1,13 +1,13 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-	<f:section title="HipChat Notifications">
-    	<f:entry title="Project Room">
-      		<f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
-    	</f:entry>
+    <f:section title="HipChat Notifications">
+        <f:entry title="Project Room">
+            <f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
+        </f:entry>
 
-    	<f:entry title="Notify Build Start">
-      		<f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
-    	</f:entry>
+        <f:entry title="Notify Build Start">
+            <f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
+        </f:entry>
 
         <f:entry title="Notify Aborted">
             <f:checkbox name="hipChatNotifyAborted" value="true" checked="${instance.getNotifyAborted()}"/>
@@ -15,6 +15,10 @@
 
         <f:entry title="Notify Failure">
             <f:checkbox name="hipChatNotifyFailure" value="true" checked="${instance.getNotifyFailure()}"/>
+        </f:entry>
+
+        <f:entry title="Notify Failure With @here">
+            <f:checkbox name="hipChatMentionFailure" value="true" checked="${instance.getMentionFailure()}"/>
         </f:entry>
 
         <f:entry title="Notify Not Built">
