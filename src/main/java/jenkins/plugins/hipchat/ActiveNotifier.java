@@ -70,6 +70,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
+
+        if (result == Result.FAILURE) {
+            getHipChat(r).publish(getBuildFailureMessage(r), "red", "text");
+        }
     }
 
     String getChanges(AbstractBuild r) {
@@ -108,6 +112,8 @@ public class ActiveNotifier implements FineGrainedNotifier {
         return message.appendOpenLink().toString();
     }
 
+
+
     static String getBuildColor(AbstractBuild r) {
         Result result = r.getResult();
         if (result == Result.SUCCESS) {
@@ -126,6 +132,16 @@ public class ActiveNotifier implements FineGrainedNotifier {
         return message.appendOpenLink().toString();
     }
 
+    String getBuildFailureMessage(AbstractBuild r) {
+        MessageBuilder message = new MessageBuilder(notifier, r);
+
+        message.append("Failure");
+        message.appendFailureNotifications(r);
+        message.append(" @here");
+
+        return message.toString();
+    }
+
     public static class MessageBuilder {
         private StringBuffer message;
         private HipChatNotifier notifier;
@@ -141,6 +157,54 @@ public class ActiveNotifier implements FineGrainedNotifier {
         public MessageBuilder appendStatusMessage() {
             message.append(getStatusMessage(build));
             return this;
+        }
+
+        public MessageBuilder appendFailureNotifications(AbstractBuild r) {
+            Set<String> authors = new HashSet<String>();
+            AbstractBuild currentBuild = (AbstractBuild) r.getProject().getLastBuild();
+            while (currentBuild != null && currentBuild.getResult() != Result.SUCCESS) {
+                Set<String> buildAuthors = getAuthors(currentBuild);
+                if (buildAuthors != null) {
+                    authors.addAll(buildAuthors);
+                }
+                currentBuild = (AbstractBuild) currentBuild.getPreviousBuild();
+            }
+            if (!authors.isEmpty()) {
+                message.append(" caused by changes from ");
+                message.append(StringUtils.join(authors, ", "));
+            }
+
+            return this;
+        }
+
+        static Set<String> getAuthors(AbstractBuild r) {
+            if (!r.hasChangeSetComputed()) {
+                logger.info("No change set computed...");
+                return null;
+            }
+            ChangeLogSet changeSet = r.getChangeSet();
+            List<Entry> entries = new LinkedList<Entry>();
+            Set<AffectedFile> files = new HashSet<AffectedFile>();
+            for (Object o : changeSet.getItems()) {
+                Entry entry = (Entry) o;
+                logger.info("Entry " + o);
+                entries.add(entry);
+                try{
+                    files.addAll(entry.getAffectedFiles());
+                } catch (UnsupportedOperationException e) {
+                    logger.info(e.getMessage());
+                    return null;
+                }
+            }
+            if (entries.isEmpty()) {
+                logger.info("Empty change...");
+                return null;
+            }
+            Set<String> authors = new HashSet<String>();
+            for (Entry entry : entries) {
+                authors.add(entry.getAuthor().getDisplayName());
+            }
+            return authors;
         }
 
         static String getStatusMessage(AbstractBuild r) {
