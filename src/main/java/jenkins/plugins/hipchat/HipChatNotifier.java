@@ -143,6 +143,7 @@ public class HipChatNotifier extends Notifier {
         private boolean notifyNotBuilt;
         private boolean notifyUnstable;
         private boolean notifyFailure;
+        private boolean notifyMentionFailure;
         private boolean notifyBackToNormal;
 
 
@@ -151,6 +152,7 @@ public class HipChatNotifier extends Notifier {
                                   boolean startNotification,
                                   boolean notifyAborted,
                                   boolean notifyFailure,
+                                  boolean notifyMentionFailure,
                                   boolean notifyNotBuilt,
                                   boolean notifySuccess,
                                   boolean notifyUnstable,
@@ -159,6 +161,7 @@ public class HipChatNotifier extends Notifier {
             this.startNotification = startNotification;
             this.notifyAborted = notifyAborted;
             this.notifyFailure = notifyFailure;
+            this.notifyMentionFailure = notifyMentionFailure;
             this.notifyNotBuilt = notifyNotBuilt;
             this.notifySuccess = notifySuccess;
             this.notifyUnstable = notifyUnstable;
@@ -205,6 +208,11 @@ public class HipChatNotifier extends Notifier {
         }
 
         @Exported
+        public boolean getMentionFailure() {
+            return notifyMentionFailure;
+        }
+
+        @Exported
         public boolean getNotifyNotBuilt() {
             return notifyNotBuilt;
         }
@@ -236,6 +244,7 @@ public class HipChatNotifier extends Notifier {
                         sr.getParameter("hipChatStartNotification") != null,
                         sr.getParameter("hipChatNotifyAborted") != null,
                         sr.getParameter("hipChatNotifyFailure") != null,
+                        sr.getParameter("hipChatMentionFailure") != null,
                         sr.getParameter("hipChatNotifyNotBuilt") != null,
                         sr.getParameter("hipChatNotifySuccess") != null,
                         sr.getParameter("hipChatNotifyUnstable") != null,

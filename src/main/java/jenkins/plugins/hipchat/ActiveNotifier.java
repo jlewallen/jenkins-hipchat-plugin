@@ -71,7 +71,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
 
-        if (result == Result.FAILURE) {
+        if (result == Result.FAILURE && jobProperty.getMentionFailure()) {
             getHipChat(r).publish(getBuildFailureMessage(r), "red", "text");
         }
     }

@@ -17,6 +17,10 @@
             <f:checkbox name="hipChatNotifyFailure" value="true" checked="${instance.getNotifyFailure()}"/>
         </f:entry>
 
+        <f:entry title="Notify Failure With @here">
+            <f:checkbox name="hipChatMentionFailure" value="true" checked="${instance.getMentionFailure()}"/>
+        </f:entry>
+
         <f:entry title="Notify Not Built">
             <f:checkbox name="hipChatNotifyNotBuilt" value="true" checked="${instance.getNotifyNotBuilt()}"/>
         </f:entry>
