@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 @SuppressWarnings({"unchecked"})
 public class HipChatNotifier extends Notifier {
+    private static final String DEFAULT_SEND_AS = "Build Server";
+    private static final String DEFAULT_API_URL = "api.hipchat.com";
 
     private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 
@@ -26,6 +28,7 @@ public class HipChatNotifier extends Notifier {
     private String buildServerUrl;
     private String room;
     private String sendAs;
+    private String apiUrl;
 
     @Override
     public DescriptorImpl getDescriptor() {
@@ -33,29 +36,34 @@ public class HipChatNotifier extends Notifier {
     }
 
     public String getRoom() {
-        return room;
+        return this.room;
     }
 
     public String getAuthToken() {
-        return authToken;
+        return this.authToken;
     }
 
     public String getBuildServerUrl() {
-        return buildServerUrl;
+        return this.buildServerUrl;
     }
 
     public String getSendAs() {
-        return sendAs;
+        return (StringUtils.isBlank(this.sendAs) ? DEFAULT_SEND_AS : this.sendAs);
+    }
+
+    public String getApiUrl() {
+        return (StringUtils.isBlank(this.apiUrl) ? DEFAULT_API_URL : this.apiUrl);
     }
 
 
     @DataBoundConstructor
-    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs) {
+    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs, final String apiUrl) {
         super();
         this.authToken = authToken;
         this.buildServerUrl = buildServerUrl;
         this.room = room;
         this.sendAs = sendAs;
+        this.apiUrl = apiUrl;
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -63,7 +71,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public HipChatService newHipChatService(final String room) {
-        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
+        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, getSendAs(), getApiUrl());
     }
 
     @Override
@@ -77,6 +85,7 @@ public class HipChatNotifier extends Notifier {
         private String room;
         private String buildServerUrl;
         private String sendAs;
+        private String apiUrl;
 
         public DescriptorImpl() {
             load();
@@ -95,7 +104,11 @@ public class HipChatNotifier extends Notifier {
         }
 
         public String getSendAs() {
-            return sendAs;
+            return (StringUtils.isBlank(sendAs) ? DEFAULT_SEND_AS : sendAs);
+        }
+
+        public String getApiUrl() {
+            return (StringUtils.isBlank(apiUrl) ? DEFAULT_API_URL : apiUrl);
         }
 
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -108,7 +121,8 @@ public class HipChatNotifier extends Notifier {
             if (buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             if (room == null) room = sr.getParameter("hipChatRoom");
             if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
-            return new HipChatNotifier(token, room, buildServerUrl, sendAs);
+            if (apiUrl == null) apiUrl = sr.getParameter("hipChatApiUrl");
+            return new HipChatNotifier(token, room, buildServerUrl, sendAs, apiUrl);
         }
 
         @Override
@@ -117,11 +131,12 @@ public class HipChatNotifier extends Notifier {
             room = sr.getParameter("hipChatRoom");
             buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             sendAs = sr.getParameter("hipChatSendAs");
+            apiUrl = sr.getParameter("hipChatApiUrl");
             if (buildServerUrl != null && !buildServerUrl.endsWith("/")) {
                 buildServerUrl = buildServerUrl + "/";
             }
             try {
-                new HipChatNotifier(token, room, buildServerUrl, sendAs);
+                new HipChatNotifier(token, room, buildServerUrl, sendAs, apiUrl);
             } catch (Exception e) {
                 throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
             }

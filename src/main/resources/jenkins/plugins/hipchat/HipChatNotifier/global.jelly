@@ -24,5 +24,8 @@
     <f:entry title="Send As" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatSendAs.html">
         <f:textbox name="hipChatSendAs" value="${descriptor.getSendAs()}" />
     </f:entry>
+    <f:entry title="Hipchat API URL" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatApiUrl.html">
+        <f:textbox name="hipChatApiUrl" value="${descriptor.getApiUrl()}" />
+    </f:entry>
   </f:section>
 </j:jelly>

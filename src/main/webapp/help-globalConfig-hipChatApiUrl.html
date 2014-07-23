@@ -1,0 +1,13 @@
+
+<div>
+  <p>
+    Enter the URL to the HipChat API to which notifications should be sent. By default this is api.hipchat.com which
+    works for all HipChat hosted groups but if you have a <a href="https://www.hipchat.com/server">self-hosted HipChat server</a>
+    you can set this to be the URL of your local HipChat server, e.g. hipchat.company.com
+  </p>
+  <p>
+    Note that if you self-signed the SSL certificate for a self hosted HipChat server you will need to add the
+    certificate file to the trust store java uses on the jenkins servers, otherwise jenkins will not be able to
+    communicate with your HipChat server. See <a href="http://anandparthasarathy.wordpress.com/2014/01/14/connect-jenkins-to-internal-self-signed-certificate-servers-and-configure-ssl/">http://anandparthasarathy.wordpress.com/2014/01/14/connect-jenkins-to-internal-self-signed-certificate-servers-and-configure-ssl/</a>
+  </p>
+</div>
