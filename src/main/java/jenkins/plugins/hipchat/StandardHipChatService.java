@@ -31,8 +31,12 @@ public class StandardHipChatService implements HipChatService {
     }
 
     public void publish(String message, String color) {
+        publish(message, color, false);
+    }
+
+    public void publish(String message, String color, Boolean notify) {
         for (String roomId : roomIds) {
-            logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
+            logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color + " " + notify);
             HttpClient client = getHttpClient();
             String url = "https://" + host + "/v1/rooms/message?auth_token=" + token;
             PostMethod post = new PostMethod(url);
@@ -42,7 +46,7 @@ public class StandardHipChatService implements HipChatService {
                 post.addParameter("room_id", roomId);
                 post.addParameter("message", message);
                 post.addParameter("color", color);
-                post.addParameter("notify", shouldNotify(color));
+                post.addParameter("notify", shouldNotify(color, notify));
                 post.getParams().setContentCharset("UTF-8");
                 int responseCode = client.executeMethod(post);
                 String response = post.getResponseBodyAsString();
@@ -68,8 +72,12 @@ public class StandardHipChatService implements HipChatService {
         return client;
     }
 
-    private String shouldNotify(String color) {
+    private String shouldColorNotify(String color) {
         return color.equalsIgnoreCase("green") ? "0" : "1";
+    }
+
+    private String shouldNotify(String color, Boolean notify) {
+        return notify ? "1" : shouldColorNotify(color);
     }
 
     void setHost(String host) {

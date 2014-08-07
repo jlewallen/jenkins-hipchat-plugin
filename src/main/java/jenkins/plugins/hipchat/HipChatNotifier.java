@@ -33,19 +33,19 @@ public class HipChatNotifier extends Notifier {
     }
 
     public String getRoom() {
-        return room;
+        return this.room;
     }
 
     public String getAuthToken() {
-        return authToken;
+        return this.authToken;
     }
 
     public String getBuildServerUrl() {
-        return buildServerUrl;
+        return this.buildServerUrl;
     }
 
     public String getSendAs() {
-        return sendAs;
+        return this.sendAs;
     }
 
 
@@ -144,6 +144,7 @@ public class HipChatNotifier extends Notifier {
         private boolean notifyUnstable;
         private boolean notifyFailure;
         private boolean notifyBackToNormal;
+        private boolean alwaysShowNotification;
 
 
         @DataBoundConstructor
@@ -154,7 +155,8 @@ public class HipChatNotifier extends Notifier {
                                   boolean notifyNotBuilt,
                                   boolean notifySuccess,
                                   boolean notifyUnstable,
-                                  boolean notifyBackToNormal) {
+                                  boolean notifyBackToNormal,
+                                  boolean alwaysShowNotification) {
             this.room = room;
             this.startNotification = startNotification;
             this.notifyAborted = notifyAborted;
@@ -163,6 +165,7 @@ public class HipChatNotifier extends Notifier {
             this.notifySuccess = notifySuccess;
             this.notifyUnstable = notifyUnstable;
             this.notifyBackToNormal = notifyBackToNormal;
+            this.alwaysShowNotification = alwaysShowNotification;
         }
 
         @Exported
@@ -219,6 +222,9 @@ public class HipChatNotifier extends Notifier {
             return notifyBackToNormal;
         }
 
+        @Exported
+        public boolean getAlwaysShowNotification() { return alwaysShowNotification; }
+
         @Extension
         public static final class DescriptorImpl extends JobPropertyDescriptor {
             public String getDisplayName() {
@@ -239,7 +245,8 @@ public class HipChatNotifier extends Notifier {
                         sr.getParameter("hipChatNotifyNotBuilt") != null,
                         sr.getParameter("hipChatNotifySuccess") != null,
                         sr.getParameter("hipChatNotifyUnstable") != null,
-                        sr.getParameter("hipChatNotifyBackToNormal") != null);
+                        sr.getParameter("hipChatNotifyBackToNormal") != null,
+                        sr.getParameter("hipChatAlwaysShowNotification") != null);
             }
         }
     }

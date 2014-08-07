@@ -1,13 +1,13 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-	<f:section title="HipChat Notifications">
-    	<f:entry title="Project Room">
-      		<f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
-    	</f:entry>
+    <f:section title="HipChat Notifications">
+        <f:entry title="Project Room">
+            <f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
+        </f:entry>
 
-    	<f:entry title="Notify Build Start">
-      		<f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
-    	</f:entry>
+        <f:entry title="Notify Build Start">
+            <f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
+        </f:entry>
 
         <f:entry title="Notify Aborted">
             <f:checkbox name="hipChatNotifyAborted" value="true" checked="${instance.getNotifyAborted()}"/>
@@ -33,6 +33,9 @@
             <f:checkbox name="hipChatNotifyBackToNormal" value="true" checked="${instance.getNotifyBackToNormal()}"/>
         </f:entry>
 
+        <f:entry title="Always Show Notification">
+            <f:checkbox name="hipChatAlwaysShowNotification" value="true" checked="${instance.getAlwaysShowNotification()}"/>
+        </f:entry>
     </f:section>
 
 </j:jelly>
