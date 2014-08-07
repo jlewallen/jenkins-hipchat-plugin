@@ -5,6 +5,10 @@
       		<f:textbox name="hipChatProjectRoom" value="${instance.getRoom()}"/>
     	</f:entry>
 
+        <f:entry title="Link to console">
+            <f:checkbox name="hipChatConsoleLink" value="true" checked="${instance.getConsoleLink()}"/>
+        </f:entry>
+
     	<f:entry title="Notify Build Start">
       		<f:checkbox name="hipChatStartNotification" value="true" checked="${instance.getStartNotification()}"/>
     	</f:entry>
