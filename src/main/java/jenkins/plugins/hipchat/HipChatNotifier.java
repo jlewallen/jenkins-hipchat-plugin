@@ -22,6 +22,7 @@ public class HipChatNotifier extends Notifier {
 
     private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 
+    private String host;
     private String authToken;
     private String buildServerUrl;
     private String room;
@@ -36,6 +37,10 @@ public class HipChatNotifier extends Notifier {
         return room;
     }
 
+    public String getHost() {
+        return host;
+    }
+    
     public String getAuthToken() {
         return authToken;
     }
@@ -50,8 +55,9 @@ public class HipChatNotifier extends Notifier {
 
 
     @DataBoundConstructor
-    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs) {
+    public HipChatNotifier(final String host, final String authToken, final String room, String buildServerUrl, final String sendAs) {
         super();
+        this.host = host;
         this.authToken = authToken;
         this.buildServerUrl = buildServerUrl;
         this.room = room;
@@ -63,7 +69,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public HipChatService newHipChatService(final String room) {
-        return new StandardHipChatService(getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
+        return new StandardHipChatService(getHost(), getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
     }
 
     @Override
@@ -73,6 +79,7 @@ public class HipChatNotifier extends Notifier {
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+        private String host;
         private String token;
         private String room;
         private String buildServerUrl;
@@ -80,6 +87,10 @@ public class HipChatNotifier extends Notifier {
 
         public DescriptorImpl() {
             load();
+        }
+        
+        public String getHost() {
+            return host;
         }
 
         public String getToken() {
@@ -104,15 +115,17 @@ public class HipChatNotifier extends Notifier {
 
         @Override
         public HipChatNotifier newInstance(StaplerRequest sr) {
+            if (host == null) host = sr.getParameter("hipChatHost");
             if (token == null) token = sr.getParameter("hipChatToken");
             if (buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             if (room == null) room = sr.getParameter("hipChatRoom");
             if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
-            return new HipChatNotifier(token, room, buildServerUrl, sendAs);
+            return new HipChatNotifier(host, token, room, buildServerUrl, sendAs);
         }
 
         @Override
         public boolean configure(StaplerRequest sr, JSONObject formData) throws FormException {
+            host = sr.getParameter("hipChatHost");
             token = sr.getParameter("hipChatToken");
             room = sr.getParameter("hipChatRoom");
             buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
@@ -121,7 +134,7 @@ public class HipChatNotifier extends Notifier {
                 buildServerUrl = buildServerUrl + "/";
             }
             try {
-                new HipChatNotifier(token, room, buildServerUrl, sendAs);
+                new HipChatNotifier(host, token, room, buildServerUrl, sendAs);
             } catch (Exception e) {
                 throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
             }

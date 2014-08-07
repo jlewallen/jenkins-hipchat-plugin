@@ -19,8 +19,11 @@ public class StandardHipChatService implements HipChatService {
     private String[] roomIds;
     private String from;
 
-    public StandardHipChatService(String token, String roomId, String from) {
+    public StandardHipChatService(String host, String token, String roomId, String from) {
         super();
+        if (host != null && !String.trim().isEmpty()) {
+            this.host = host;
+        }
         this.token = token;
         this.roomIds = roomId.split(",");
         this.from = from;
@@ -31,8 +34,9 @@ public class StandardHipChatService implements HipChatService {
     }
 
     public void publish(String message, String color) {
+        logger.info("Publishing messages to HipChat server [" + host + "]...");
         for (String roomId : roomIds) {
-            logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
+            logger.info("`" + from + "` says to room `" + roomId + "`: `" + message + "` in the color `" + color + "`");
             HttpClient client = getHttpClient();
             String url = "https://" + host + "/v1/rooms/message?auth_token=" + token;
             PostMethod post = new PostMethod(url);
@@ -55,6 +59,8 @@ public class StandardHipChatService implements HipChatService {
                 post.releaseConnection();
             }
         }
+        
+        logger.info("Done publishing messages to HipChat server");
     }
     
     private HttpClient getHttpClient() {
