@@ -173,7 +173,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
 
         public MessageBuilder appendOpenLink() {
+            AbstractProject<?, ?> project = build.getProject();
+            HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
             String url = notifier.getBuildServerUrl() + build.getUrl();
+            if (jobProperty.getConsoleLink()) url += "console";
             message.append(" (<a href='").append(url).append("'>Open</a>)");
             return this;
         }
