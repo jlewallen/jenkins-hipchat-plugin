@@ -12,6 +12,10 @@ import hudson.ProxyConfiguration;
 
 public class StandardHipChatService implements HipChatService {
 
+    /**
+     * HTTP Connection timeout when making calls to HipChat
+     */
+    public static final Integer CONNECTION_TIMEOUT = 10000;
     private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
 
     private String host = "api.hipchat.com";
@@ -59,6 +63,9 @@ public class StandardHipChatService implements HipChatService {
     
     private HttpClient getHttpClient() {
         HttpClient client = new HttpClient();
+        client.getHttpConnectionManager().getParams().setConnectionTimeout(CONNECTION_TIMEOUT);
+        client.getHttpConnectionManager().getParams().setSoTimeout(CONNECTION_TIMEOUT);
+
         if (Jenkins.getInstance() != null) {
             ProxyConfiguration proxy = Jenkins.getInstance().proxy;
             if (proxy != null) {
