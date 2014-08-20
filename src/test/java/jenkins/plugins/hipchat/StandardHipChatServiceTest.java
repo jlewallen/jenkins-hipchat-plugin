@@ -11,7 +11,7 @@ public class StandardHipChatServiceTest {
      */
     @Test
     public void publishWithBadHostShouldNotRethrowExceptions() {
-        StandardHipChatService service = new StandardHipChatService("token", "room", "from");
+        StandardHipChatService service = new StandardHipChatService("badhost", "token", "room", "from");
         service.setHost("hostvaluethatwillcausepublishtofail");
         service.publish("message");
     }

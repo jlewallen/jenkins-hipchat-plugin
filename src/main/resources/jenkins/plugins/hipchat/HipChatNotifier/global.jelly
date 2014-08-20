@@ -12,6 +12,9 @@
     so it should be straightforward to find them.
   -->
 <f:section title="Global HipChat Notifier Settings">
+    <f:entry title="HipChat Server" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatServer.html">
+        <f:textbox name="hipChatServer" default="api.hipchat.com" value="${descriptor.getServer()}" />
+    </f:entry>
     <f:entry title="API Token" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatToken.html">
         <f:textbox name="hipChatToken" value="${descriptor.getToken()}" />
     </f:entry>
