@@ -25,7 +25,7 @@ public class StandardHipChatService implements HipChatService {
         super();
         this.host = host == null ? DEFAULT_HOST : host;
         this.token = token;
-        this.roomIds = roomIds == null ? DEFAULT_ROOMS : roomIds.split(",");
+        this.roomIds = roomIds == null ? DEFAULT_ROOMS : roomIds.split("\\s*,\\s*");
         this.from = from == null ? DEFAULT_FROM : from;
     }
 

@@ -31,6 +31,12 @@ public class StandardHipChatServiceTest {
     }
 
     @Test
+    public void shouldTrimTheRoomIds() {
+        StandardHipChatService service = new StandardHipChatService(null, "token", "room1, room2", "from");
+        assertArrayEquals(new String[]{"room1", "room2"}, service.getRoomIds());
+    }
+
+    @Test
     public void shouldNotSplitTheRoomsIfNullIsPassed() {
         StandardHipChatService service = new StandardHipChatService(null, "token", null, "from");
         assertArrayEquals(new String[0], service.getRoomIds());
