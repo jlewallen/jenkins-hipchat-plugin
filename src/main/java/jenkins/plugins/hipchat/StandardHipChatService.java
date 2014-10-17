@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StandardHipChatService implements HipChatService {
+
     private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
     private static final String DEFAULT_HOST = "api.hipchat.com";
     private static final String[] DEFAULT_ROOMS = new String[0];

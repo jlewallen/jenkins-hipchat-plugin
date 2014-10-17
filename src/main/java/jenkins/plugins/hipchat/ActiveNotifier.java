@@ -24,7 +24,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
     private static final Logger logger = Logger.getLogger(ActiveNotifier.class.getName());
 
-    HipChatNotifier notifier;
+    private final HipChatNotifier notifier;
 
     public ActiveNotifier(HipChatNotifier notifier) {
         super();
@@ -32,9 +32,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     private HipChatService getHipChat(AbstractBuild r) {
-        AbstractProject<?, ?> project = r.getProject();
-        String projectRoom = Util.fixEmpty(project.getProperty(HipChatNotifier.HipChatJobProperty.class).getRoom());
-        return notifier.newHipChatService(projectRoom);
+        return notifier.newHipChatService();
     }
 
     public void deleted(AbstractBuild r) {
@@ -47,7 +45,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         if (changes != null) {
             notifyStart(build, changes);
         } else if (cause != null) {
-            MessageBuilder message = new MessageBuilder(notifier, build);
+            MessageBuilder message = new MessageBuilder(build);
             message.append(cause.getShortDescription());
             notifyStart(build, message.appendOpenLink().toString());
         } else {
@@ -64,16 +62,15 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
     public void completed(AbstractBuild r) {
         AbstractProject<?, ?> project = r.getProject();
-        HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
         Result result = r.getResult();
         AbstractBuild<?, ?> previousBuild = project.getLastBuild().getPreviousBuild();
         Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
-        if ((result == Result.ABORTED && jobProperty.getNotifyAborted())
-                || (result == Result.FAILURE && jobProperty.getNotifyFailure())
-                || (result == Result.NOT_BUILT && jobProperty.getNotifyNotBuilt())
-                || (result == Result.SUCCESS && previousResult == Result.FAILURE && jobProperty.getNotifyBackToNormal())
-                || (result == Result.SUCCESS && jobProperty.getNotifySuccess())
-                || (result == Result.UNSTABLE && jobProperty.getNotifyUnstable())) {
+        if ((result == Result.ABORTED && notifier.isNotifyAborted())
+                || (result == Result.FAILURE && notifier.isNotifyFailure())
+                || (result == Result.NOT_BUILT && notifier.isNotifyNotBuilt())
+                || (result == Result.SUCCESS && previousResult == Result.FAILURE && notifier.isNotifyBackToNormal())
+                || (result == Result.SUCCESS && notifier.isNotifySuccess())
+                || (result == Result.UNSTABLE && notifier.isNotifyUnstable())) {
             getHipChat(r).publish(getBuildStatusMessage(r), getBuildColor(r));
         }
     }
@@ -105,7 +102,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         for (Entry entry : entries) {
             authors.add(entry.getAuthor().getDisplayName());
         }
-        MessageBuilder message = new MessageBuilder(notifier, r);
+        MessageBuilder message = new MessageBuilder(r);
         message.append("Started by changes from ");
         message.append(StringUtils.join(authors, ", "));
         message.append(" (");
@@ -126,7 +123,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     String getBuildStatusMessage(AbstractBuild r) {
-        MessageBuilder message = new MessageBuilder(notifier, r);
+        MessageBuilder message = new MessageBuilder(r);
         message.appendStatusMessage();
         message.appendDuration();
         return message.appendOpenLink().toString();
@@ -134,11 +131,9 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
     public static class MessageBuilder {
         private final StringBuffer message;
-        private final HipChatNotifier notifier;
         private final AbstractBuild build;
 
-        public MessageBuilder(HipChatNotifier notifier, AbstractBuild build) {
-            this.notifier = notifier;
+        public MessageBuilder(AbstractBuild build) {
             this.message = new StringBuffer();
             this.build = build;
             startMessage();

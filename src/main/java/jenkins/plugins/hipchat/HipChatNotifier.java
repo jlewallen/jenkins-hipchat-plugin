@@ -12,6 +12,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -26,59 +27,143 @@ import java.util.logging.Logger;
 public class HipChatNotifier extends Notifier {
 
     private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
+    private String room;
+    private boolean startNotification;
+    private boolean notifySuccess;
+    private boolean notifyAborted;
+    private boolean notifyNotBuilt;
+    private boolean notifyUnstable;
+    private boolean notifyFailure;
+    private boolean notifyBackToNormal;
 
-    private final String server;
-    private final String authToken;
-    private final String room;
-    private final String sendAs;
-
-    @Override
-    public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl) super.getDescriptor();
+    @DataBoundConstructor
+    public HipChatNotifier(String room, boolean startNotification, boolean notifySuccess, boolean notifyAborted,
+            boolean notifyNotBuilt, boolean notifyUnstable, boolean notifyFailure, boolean notifyBackToNormal) {
+        this.room = room;
+        this.startNotification = startNotification;
+        this.notifySuccess = notifySuccess;
+        this.notifyAborted = notifyAborted;
+        this.notifyNotBuilt = notifyNotBuilt;
+        this.notifyUnstable = notifyUnstable;
+        this.notifyFailure = notifyFailure;
+        this.notifyBackToNormal = notifyBackToNormal;
     }
 
-    public String getServer() {
-        return this.server;
+    public boolean isStartNotification() {
+        return startNotification;
+    }
+
+    public void setStartNotification(boolean startNotification) {
+        this.startNotification = startNotification;
+    }
+
+    public boolean isNotifySuccess() {
+        return notifySuccess;
+    }
+
+    public void setNotifySuccess(boolean notifySuccess) {
+        this.notifySuccess = notifySuccess;
+    }
+
+    public boolean isNotifyAborted() {
+        return notifyAborted;
+    }
+
+    public void setNotifyAborted(boolean notifyAborted) {
+        this.notifyAborted = notifyAborted;
+    }
+
+    public boolean isNotifyNotBuilt() {
+        return notifyNotBuilt;
+    }
+
+    public void setNotifyNotBuilt(boolean notifyNotBuilt) {
+        this.notifyNotBuilt = notifyNotBuilt;
+    }
+
+    public boolean isNotifyUnstable() {
+        return notifyUnstable;
+    }
+
+    public void setNotifyUnstable(boolean notifyUnstable) {
+        this.notifyUnstable = notifyUnstable;
+    }
+
+    public boolean isNotifyFailure() {
+        return notifyFailure;
+    }
+
+    public void setNotifyFailure(boolean notifyFailure) {
+        this.notifyFailure = notifyFailure;
+    }
+
+    public boolean isNotifyBackToNormal() {
+        return notifyBackToNormal;
+    }
+
+    public void setNotifyBackToNormal(boolean notifyBackToNormal) {
+        this.notifyBackToNormal = notifyBackToNormal;
     }
 
     public String getRoom() {
-        return this.room;
+        return StringUtils.isBlank(room) ? getDescriptor().getRoom() : room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
+    }
+
+    @Override
+    public DescriptorImpl getDescriptor() {
+        return Jenkins.getInstance().getDescriptorByType(DescriptorImpl.class);
+    }
+
+    @Override
+    public boolean needsToRunAfterFinalized() {
+        return true;
+    }
+
+    public String getServer() {
+        return getDescriptor().getServer();
     }
 
     public String getAuthToken() {
-        return this.authToken;
+        return getDescriptor().getToken();
     }
 
     public String getSendAs() {
-        return this.sendAs;
-    }
-
-    @DataBoundConstructor
-    public HipChatNotifier(final String server, final String authToken, final String room, final String sendAs) {
-        this.server = server;
-        this.authToken = authToken;
-        this.room = room;
-        this.sendAs = sendAs;
+        return getDescriptor().getSendAs();
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
 
-    public HipChatService newHipChatService(final String room) {
-        return new StandardHipChatService(getServer(), getAuthToken(), room == null ? getRoom() : room, StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
+    public HipChatService newHipChatService() {
+        return new StandardHipChatService(getServer(), getAuthToken(), getRoom(),
+                StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
+    }
+
+    @Override
+    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
+        if (startNotification) {
+            logger.info("Invoking Started...");
+            new ActiveNotifier(this).started(build);
+        }
+        return super.prebuild(build, listener);
     }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
-        logger.info("Invoking Completed");
+        logger.info("Invoking Completed...");
         new ActiveNotifier(this).completed(build);
         return super.perform(build, launcher, listener);
     }
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+
         private String server;
         private String token;
         private String room;
@@ -92,16 +177,32 @@ public class HipChatNotifier extends Notifier {
             return server;
         }
 
+        public void setServer(String server) {
+            this.server = server;
+        }
+
         public String getToken() {
             return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
         }
 
         public String getRoom() {
             return room;
         }
 
+        public void setRoom(String room) {
+            this.room = room;
+        }
+
         public String getSendAs() {
             return sendAs;
+        }
+
+        public void setSendAs(String sendAs) {
+            this.sendAs = sendAs;
         }
 
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -109,25 +210,9 @@ public class HipChatNotifier extends Notifier {
         }
 
         @Override
-        public HipChatNotifier newInstance(StaplerRequest sr, JSONObject formData) {
-            if (server == null) server = sr.getParameter("hipChatServer");
-            if (token == null) token = sr.getParameter("hipChatToken");
-            if (room == null) room = sr.getParameter("hipChatRoom");
-            if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
-            return new HipChatNotifier(server, token, room, sendAs);
-        }
-
-        @Override
         public boolean configure(StaplerRequest request, JSONObject formData) throws FormException {
-            server = request.getParameter("hipChatServer");
-            token = request.getParameter("hipChatToken");
-            room = request.getParameter("hipChatRoom");
-            sendAs = request.getParameter("hipChatSendAs");
-            try {
-                new HipChatNotifier(server, token, room, sendAs);
-            } catch (Exception e) {
-                throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
-            }
+            request.bindJSON(this, formData);
+
             save();
             return super.configure(request, formData);
         }
@@ -138,6 +223,14 @@ public class HipChatNotifier extends Notifier {
         }
     }
 
+    /**
+     * The settings defined here have been moved to the {@link HipChatNotifier} configuration (shows up under the Post
+     * Build task view).
+     *
+     * @deprecated The plugin configuration should be stored in {@link HipChatNotifier}. This class only exists, so
+     * configurations can be migrated for the build jobs.
+     */
+    @Deprecated
     public static class HipChatJobProperty extends hudson.model.JobProperty<AbstractProject<?, ?>> {
         private final String room;
         private final boolean startNotification;

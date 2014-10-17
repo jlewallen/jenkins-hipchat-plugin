@@ -1,0 +1,36 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <f:section title="${%HipChat Notifications}">
+        <f:entry title="${%Project Room}">
+            <f:textbox name="hipchat.room" value="${instance.room}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Build Start}">
+            <f:checkbox name="hipchat.startNotification" checked="${instance.startNotification}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Aborted}">
+            <f:checkbox name="hipchat.notifyAborted" checked="${instance.notifyAborted}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Failure}">
+            <f:checkbox name="hipchat.notifyFailure" checked="${instance.notifyFailure}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Not Built}">
+            <f:checkbox name="hipchat.notifyNotBuilt" checked="${instance.notifyNotBuilt}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Success}">
+            <f:checkbox name="hipchat.notifySuccess" checked="${instance.notifySuccess}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Unstable}">
+            <f:checkbox name="hipchat.notifyUnstable" checked="${instance.notifyUnstable}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Back To Normal}">
+            <f:checkbox name="hipchat.notifyBackToNormal" checked="${instance.notifyBackToNormal}" />
+        </f:entry>
+    </f:section>
+</j:jelly>
