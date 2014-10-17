@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 
 @SuppressWarnings("rawtypes")
 public class ActiveNotifier implements FineGrainedNotifier {
@@ -183,7 +184,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
 
         public MessageBuilder appendOpenLink() {
-            String url = notifier.getBuildServerUrl() + build.getUrl();
+            String url = Jenkins.getInstance().getRootUrl() + build.getUrl();
             message.append(" (<a href='").append(url).append("'>Open</a>)");
             return this;
         }

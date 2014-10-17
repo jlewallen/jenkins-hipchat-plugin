@@ -29,7 +29,6 @@ public class HipChatNotifier extends Notifier {
 
     private final String server;
     private final String authToken;
-    private final String buildServerUrl;
     private final String room;
     private final String sendAs;
 
@@ -50,21 +49,14 @@ public class HipChatNotifier extends Notifier {
         return this.authToken;
     }
 
-    public String getBuildServerUrl() {
-        return this.buildServerUrl;
-    }
-
     public String getSendAs() {
         return this.sendAs;
     }
 
-
     @DataBoundConstructor
-    public HipChatNotifier(final String server, final String authToken, final String room, String buildServerUrl, final String sendAs) {
-        super();
+    public HipChatNotifier(final String server, final String authToken, final String room, final String sendAs) {
         this.server = server;
         this.authToken = authToken;
-        this.buildServerUrl = buildServerUrl;
         this.room = room;
         this.sendAs = sendAs;
     }
@@ -87,7 +79,6 @@ public class HipChatNotifier extends Notifier {
         private String server;
         private String token;
         private String room;
-        private String buildServerUrl;
         private String sendAs;
 
         public DescriptorImpl() {
@@ -106,10 +97,6 @@ public class HipChatNotifier extends Notifier {
             return room;
         }
 
-        public String getBuildServerUrl() {
-            return buildServerUrl;
-        }
-
         public String getSendAs() {
             return sendAs;
         }
@@ -119,32 +106,27 @@ public class HipChatNotifier extends Notifier {
         }
 
         @Override
-        public HipChatNotifier newInstance(StaplerRequest sr) {
+        public HipChatNotifier newInstance(StaplerRequest sr, JSONObject formData) {
             if (server == null) server = sr.getParameter("hipChatServer");
             if (token == null) token = sr.getParameter("hipChatToken");
-            if (buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             if (room == null) room = sr.getParameter("hipChatRoom");
             if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
-            return new HipChatNotifier(server, token, room, buildServerUrl, sendAs);
+            return new HipChatNotifier(server, token, room, sendAs);
         }
 
         @Override
-        public boolean configure(StaplerRequest sr, JSONObject formData) throws FormException {
-            server = sr.getParameter("hipChatServer");
-            token = sr.getParameter("hipChatToken");
-            room = sr.getParameter("hipChatRoom");
-            buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
-            sendAs = sr.getParameter("hipChatSendAs");
-            if (buildServerUrl != null && !buildServerUrl.endsWith("/")) {
-                buildServerUrl = buildServerUrl + "/";
-            }
+        public boolean configure(StaplerRequest request, JSONObject formData) throws FormException {
+            server = request.getParameter("hipChatServer");
+            token = request.getParameter("hipChatToken");
+            room = request.getParameter("hipChatRoom");
+            sendAs = request.getParameter("hipChatSendAs");
             try {
-                new HipChatNotifier(server, token, room, buildServerUrl, sendAs);
+                new HipChatNotifier(server, token, room, sendAs);
             } catch (Exception e) {
                 throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
             }
             save();
-            return super.configure(sr, formData);
+            return super.configure(request, formData);
         }
 
         @Override
