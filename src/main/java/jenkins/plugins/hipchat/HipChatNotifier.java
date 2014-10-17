@@ -70,8 +70,11 @@ public class HipChatNotifier extends Notifier {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        return true;
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+            throws InterruptedException, IOException {
+        logger.info("Invoking Completed");
+        new ActiveNotifier(this).completed(build);
+        return super.perform(build, launcher, listener);
     }
 
     @Extension
