@@ -12,10 +12,12 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
+import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 
@@ -168,6 +170,7 @@ public class HipChatNotifier extends Notifier {
         private String token;
         private String room;
         private String sendAs;
+        private static int testNotificationCount = 0;
 
         public DescriptorImpl() {
             load();
@@ -215,6 +218,14 @@ public class HipChatNotifier extends Notifier {
 
             save();
             return super.configure(request, formData);
+        }
+
+        public FormValidation doSendTestNotification(@QueryParameter("hipchat.server") String server,
+                @QueryParameter("hipchat.token") String token, @QueryParameter("hipchat.room") String room,
+                @QueryParameter("hipchat.sendAs") String sendAs) {
+            HipChatService service = new StandardHipChatService(server, token, room, sendAs);
+            service.publish("Test notification " + ++testNotificationCount);
+            return FormValidation.ok("Test notification sent");
         }
 
         @Override
