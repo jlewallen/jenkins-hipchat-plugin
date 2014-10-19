@@ -142,8 +142,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public HipChatService newHipChatService() {
-        return new StandardHipChatService(getServer(), getAuthToken(), getRoom(),
-                StringUtils.isBlank(getSendAs()) ? "Build Server" : getSendAs());
+        return new StandardHipChatService(getServer(), getAuthToken(), getRoom(), getSendAs());
     }
 
     @Override
@@ -166,10 +165,10 @@ public class HipChatNotifier extends Notifier {
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
-        private String server;
+        private String server = "api.hipchat.com";
         private String token;
         private String room;
-        private String sendAs;
+        private String sendAs = "Jenkins";
         private static int testNotificationCount = 0;
 
         public DescriptorImpl() {

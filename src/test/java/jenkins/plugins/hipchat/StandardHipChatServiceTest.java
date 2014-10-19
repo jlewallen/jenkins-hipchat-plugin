@@ -13,15 +13,9 @@ public class StandardHipChatServiceTest {
     }
 
     @Test
-    public void shouldSetADefaultHost() {
-        StandardHipChatService service = new StandardHipChatService(null, "token", "room", "from");
-        assertEquals("api.hipchat.com", service.getHost());
-    }
-
-    @Test
     public void shouldBeAbleToOverrideHost() {
         StandardHipChatService service = new StandardHipChatService("some.other.host", "token", "room", "from");
-        assertEquals("some.other.host", service.getHost());
+        assertEquals("some.other.host", service.getServer());
     }
 
     @Test
@@ -43,14 +37,8 @@ public class StandardHipChatServiceTest {
     }
 
     @Test
-    public void shouldProvideADefaultFrom() {
-        StandardHipChatService service = new StandardHipChatService(null, "token", "room", null);
-        assertEquals("Build Server", service.getFrom());
-    }
-
-    @Test
     public void shouldBeAbleToOverrideFrom() {
         StandardHipChatService service = new StandardHipChatService(null, "token", "room", "from");
-        assertEquals("from", service.getFrom());
+        assertEquals("from", service.getSendAs());
     }
 }

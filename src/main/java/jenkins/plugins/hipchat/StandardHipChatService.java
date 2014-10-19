@@ -12,21 +12,19 @@ import java.util.logging.Logger;
 public class StandardHipChatService implements HipChatService {
 
     private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
-    private static final String DEFAULT_HOST = "api.hipchat.com";
     private static final String[] DEFAULT_ROOMS = new String[0];
-    private static final String DEFAULT_FROM = "Build Server";
 
-    private final String host;
+    private final String server;
     private final String token;
     private final String[] roomIds;
-    private final String from;
+    private final String sendAs;
 
-    public StandardHipChatService(String host, String token, String roomIds, String from) {
+    public StandardHipChatService(String server, String token, String roomIds, String sendAs) {
         super();
-        this.host = host == null ? DEFAULT_HOST : host;
+        this.server = server;
         this.token = token;
         this.roomIds = roomIds == null ? DEFAULT_ROOMS : roomIds.split("\\s*,\\s*");
-        this.from = from == null ? DEFAULT_FROM : from;
+        this.sendAs = sendAs;
     }
 
     public void publish(String message) {
@@ -35,13 +33,13 @@ public class StandardHipChatService implements HipChatService {
 
     public void publish(String message, String color) {
         for (String roomId : roomIds) {
-            logger.log(Level.INFO, "Posting: {0} to {1}: {2} {3}", new Object[]{from, roomId, message, color});
+            logger.log(Level.INFO, "Posting: {0} to {1}: {2} {3}", new Object[]{sendAs, roomId, message, color});
             HttpClient client = getHttpClient();
-            String url = "https://" + host + "/v1/rooms/message?auth_token=" + token;
+            String url = "https://" + server + "/v1/rooms/message?auth_token=" + token;
             PostMethod post = new PostMethod(url);
 
             try {
-                post.addParameter("from", from);
+                post.addParameter("from", sendAs);
                 post.addParameter("room_id", roomId);
                 post.addParameter("message", message);
                 post.addParameter("color", color);
@@ -78,15 +76,15 @@ public class StandardHipChatService implements HipChatService {
         return color.equalsIgnoreCase("green") ? "0" : "1";
     }
 
-    public String getHost() {
-        return host;
+    public String getServer() {
+        return server;
     }
 
     public String[] getRoomIds() {
         return roomIds;
     }
 
-    public String getFrom() {
-        return from;
+    public String getSendAs() {
+        return sendAs;
     }
 }

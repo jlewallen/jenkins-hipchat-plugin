@@ -10,7 +10,7 @@
             <f:textbox name="hipchat.room" value="${descriptor.room}" />
         </f:entry>
         <f:entry title="${%Send As}" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatSendAs.html">
-            <f:textbox name="hipchat.sendAs" default="Build User" value="${descriptor.sendAs}" />
+            <f:textbox name="hipchat.sendAs" default="Jenkins" value="${descriptor.sendAs}" />
         </f:entry>
         <f:validateButton method="sendTestNotification" title="${%Test configuration}" progress="${%Testing...}"
                           with="hipchat.server,hipchat.token,hipchat.room,hipchat.sendAs" />
