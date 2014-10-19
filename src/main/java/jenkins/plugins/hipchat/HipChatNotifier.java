@@ -223,13 +223,13 @@ public class HipChatNotifier extends Notifier {
                 @QueryParameter("hipchat.token") String token, @QueryParameter("hipchat.room") String room,
                 @QueryParameter("hipchat.sendAs") String sendAs) {
             HipChatService service = new StandardHipChatService(server, token, room, sendAs);
-            service.publish("Test notification " + ++testNotificationCount);
-            return FormValidation.ok("Test notification sent");
+            service.publish(Messages.TestNotification(++testNotificationCount));
+            return FormValidation.ok(Messages.TestNotificationSent());
         }
 
         @Override
         public String getDisplayName() {
-            return "HipChat Notifications";
+            return Messages.DisplayName();
         }
     }
 
