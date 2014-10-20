@@ -2,7 +2,12 @@ package jenkins.plugins.hipchat;
 
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.Descriptor;
+import hudson.model.Job;
+import hudson.model.JobPropertyDescriptor;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
@@ -22,11 +27,11 @@ public class HipChatNotifier extends Notifier {
 
     private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
 
-    private String server;
-    private String authToken;
-    private String buildServerUrl;
-    private String room;
-    private String sendAs;
+    private final String server;
+    private final String authToken;
+    private final String buildServerUrl;
+    private final String room;
+    private final String sendAs;
 
     @Override
     public DescriptorImpl getDescriptor() {
@@ -149,14 +154,14 @@ public class HipChatNotifier extends Notifier {
     }
 
     public static class HipChatJobProperty extends hudson.model.JobProperty<AbstractProject<?, ?>> {
-        private String room;
-        private boolean startNotification;
-        private boolean notifySuccess;
-        private boolean notifyAborted;
-        private boolean notifyNotBuilt;
-        private boolean notifyUnstable;
-        private boolean notifyFailure;
-        private boolean notifyBackToNormal;
+        private final String room;
+        private final boolean startNotification;
+        private final boolean notifySuccess;
+        private final boolean notifyAborted;
+        private final boolean notifyNotBuilt;
+        private final boolean notifyUnstable;
+        private final boolean notifyFailure;
+        private final boolean notifyBackToNormal;
 
 
         @DataBoundConstructor

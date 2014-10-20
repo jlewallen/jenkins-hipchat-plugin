@@ -6,7 +6,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,10 +15,10 @@ public class StandardHipChatService implements HipChatService {
     private static final String[] DEFAULT_ROOMS = new String[0];
     private static final String DEFAULT_FROM = "Build Server";
 
-    private String host;
-    private String token;
-    private String[] roomIds;
-    private String from;
+    private final String host;
+    private final String token;
+    private final String[] roomIds;
+    private final String from;
 
     public StandardHipChatService(String host, String token, String roomIds, String from) {
         super();
@@ -35,7 +34,7 @@ public class StandardHipChatService implements HipChatService {
 
     public void publish(String message, String color) {
         for (String roomId : roomIds) {
-            logger.info("Posting: " + from + " to " + roomId + ": " + message + " " + color);
+            logger.log(Level.INFO, "Posting: {0} to {1}: {2} {3}", new Object[]{from, roomId, message, color});
             HttpClient client = getHttpClient();
             String url = "https://" + host + "/v1/rooms/message?auth_token=" + token;
             PostMethod post = new PostMethod(url);
@@ -50,7 +49,7 @@ public class StandardHipChatService implements HipChatService {
                 int responseCode = client.executeMethod(post);
                 String response = post.getResponseBodyAsString();
                 if (responseCode != HttpStatus.SC_OK || !response.contains("\"sent\"")) {
-                    logger.log(Level.WARNING, "HipChat post may have failed. Response: " + response);
+                    logger.log(Level.WARNING, "HipChat post may have failed. Response: {0}", response);
                 }
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error posting to HipChat", e);

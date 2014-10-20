@@ -46,7 +46,7 @@ public class HipChatListener extends RunListener<AbstractBuild> {
     }
 
     @SuppressWarnings("unchecked")
-    FineGrainedNotifier getNotifier(AbstractProject project) {
+    FineGrainedNotifier getNotifier(AbstractProject<?, ?> project) {
         Map<Descriptor<Publisher>, Publisher> map = project.getPublishersList().toMap();
         for (Publisher publisher : map.values()) {
             if (publisher instanceof HipChatNotifier) {

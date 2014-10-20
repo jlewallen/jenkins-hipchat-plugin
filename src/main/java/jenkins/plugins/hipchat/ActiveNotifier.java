@@ -1,7 +1,11 @@
 package jenkins.plugins.hipchat;
 
 import hudson.Util;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.CauseAction;
+import hudson.model.Result;
+import hudson.model.Run;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.AffectedFile;
 import hudson.scm.ChangeLogSet.Entry;
@@ -11,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SuppressWarnings("rawtypes")
@@ -82,7 +87,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
         Set<AffectedFile> files = new HashSet<AffectedFile>();
         for (Object o : changeSet.getItems()) {
             Entry entry = (Entry) o;
-            logger.info("Entry " + o);
+            logger.log(Level.INFO, "Entry {0}", o);
             entries.add(entry);
             try{
             	files.addAll(entry.getAffectedFiles());
@@ -127,9 +132,9 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     public static class MessageBuilder {
-        private StringBuffer message;
-        private HipChatNotifier notifier;
-        private AbstractBuild build;
+        private final StringBuffer message;
+        private final HipChatNotifier notifier;
+        private final AbstractBuild build;
 
         public MessageBuilder(HipChatNotifier notifier, AbstractBuild build) {
             this.notifier = notifier;
@@ -189,6 +194,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             return this;
         }
 
+        @Override
         public String toString() {
             return message.toString();
         }
