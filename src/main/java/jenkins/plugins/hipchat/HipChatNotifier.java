@@ -286,20 +286,6 @@ public class HipChatNotifier extends Notifier {
             return notifySuccess;
         }
 
-        @Override
-        public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-            if (startNotification) {
-                Map<Descriptor<Publisher>, Publisher> map = build.getProject().getPublishersList().toMap();
-                for (Publisher publisher : map.values()) {
-                    if (publisher instanceof HipChatNotifier) {
-                        logger.info("Invoking Started...");
-                        new ActiveNotifier((HipChatNotifier) publisher).started(build);
-                    }
-                }
-            }
-            return super.prebuild(build, listener);
-        }
-
         @Exported
         public boolean getNotifyAborted() {
             return notifyAborted;
