@@ -282,7 +282,7 @@ public class HipChatNotifier extends Notifier {
                 @QueryParameter("hipchat.token") String token, @QueryParameter("hipchat.room") String room,
                 @QueryParameter("hipchat.sendAs") String sendAs) {
             HipChatService service = new StandardHipChatService(server, token, room, sendAs);
-            service.publish(Messages.TestNotification(++testNotificationCount));
+            service.publish(Messages.TestNotification(++testNotificationCount), "yellow");
             return FormValidation.ok(Messages.TestNotificationSent());
         }
 
