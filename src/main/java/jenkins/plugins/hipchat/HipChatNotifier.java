@@ -148,11 +148,9 @@ public class HipChatNotifier extends Notifier {
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-        if (startNotification) {
+        if (isNotificationEnabled(STARTED)) {
             logger.fine("Creating build start notification");
-            if (isNotificationEnabled(STARTED)) {
-                newHipChatService().publish(STARTED.getStatusMessage(build), STARTED.getColor());
-            }
+            newHipChatService().publish(STARTED.getMessage(build), STARTED.getColor());
         }
         return super.prebuild(build, listener);
     }
@@ -160,13 +158,13 @@ public class HipChatNotifier extends Notifier {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
-        logger.fine("Invoking Completed...");
+        logger.fine("Creating build completed notification");
         Result result = build.getResult();
         Result previousResult = findPreviousBuildResult(build);
 
         NotificationType notificationType = determineNotificationType(previousResult, result);
         if (isNotificationEnabled(notificationType)) {
-            newHipChatService().publish(notificationType.getStatusMessage(build), notificationType.getColor());
+            newHipChatService().publish(notificationType.getMessage(build), notificationType.getColor());
         }
 
         return super.perform(build, launcher, listener);
