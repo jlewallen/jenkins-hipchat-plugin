@@ -14,7 +14,7 @@ public class StandardHipChatService implements HipChatService {
     /**
      * HTTP Connection timeout when making calls to HipChat
      */
-    public static final Integer CONNECTION_TIMEOUT = 10000;
+    public static final Integer DEFAULT_TIMEOUT = 10000;
     private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
     private static final String[] DEFAULT_ROOMS = new String[0];
 
@@ -64,8 +64,8 @@ public class StandardHipChatService implements HipChatService {
 
     private HttpClient getHttpClient() {
         HttpClient client = new HttpClient();
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(CONNECTION_TIMEOUT);
-        client.getHttpConnectionManager().getParams().setSoTimeout(CONNECTION_TIMEOUT);
+        client.getHttpConnectionManager().getParams().setConnectionTimeout(DEFAULT_TIMEOUT);
+        client.getHttpConnectionManager().getParams().setSoTimeout(DEFAULT_TIMEOUT);
 
         if (Jenkins.getInstance() != null) {
             ProxyConfiguration proxy = Jenkins.getInstance().proxy;
