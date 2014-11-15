@@ -152,7 +152,8 @@ public class HipChatNotifier extends Notifier {
             logger.fine("Creating build start notification");
             newHipChatService().publish(STARTED.getMessage(build), STARTED.getColor());
         }
-        return super.prebuild(build, listener);
+
+        return true;
     }
 
     @Override
@@ -167,7 +168,7 @@ public class HipChatNotifier extends Notifier {
             newHipChatService().publish(notificationType.getMessage(build), notificationType.getColor());
         }
 
-        return super.perform(build, launcher, listener);
+        return true;
     }
 
     private Result findPreviousBuildResult(AbstractBuild<?,?> build) {
