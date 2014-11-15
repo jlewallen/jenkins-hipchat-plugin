@@ -1,6 +1,7 @@
 package jenkins.plugins.hipchat;
 
 import hudson.ProxyConfiguration;
+import hudson.model.AbstractBuild;
 import jenkins.model.Jenkins;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -30,8 +31,8 @@ public class StandardHipChatService implements HipChatService {
         this.sendAs = sendAs;
     }
 
-    public void publish(String message) {
-        publish(message, "yellow");
+    public void publish(NotificationType notificationType, AbstractBuild<?, ?> build) {
+        publish(notificationType.getMessage(build), notificationType.getColor());
     }
 
     public void publish(String message, String color) {

@@ -1,7 +1,10 @@
 package jenkins.plugins.hipchat;
 
+import hudson.model.AbstractBuild;
+
 public interface HipChatService {
-    void publish(String message);
+
+    void publish(NotificationType notificationType, AbstractBuild<?, ?> build);
 
     void publish(String message, String color);
 
