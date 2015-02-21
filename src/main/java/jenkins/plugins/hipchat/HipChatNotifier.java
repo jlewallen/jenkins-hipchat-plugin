@@ -1,5 +1,6 @@
 package jenkins.plugins.hipchat;
 
+import com.google.common.base.Preconditions;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
@@ -42,10 +43,20 @@ public class HipChatNotifier extends Notifier {
     private boolean notifyFailure;
     private boolean notifyBackToNormal;
 
+    private String messageStarted;
+    private String messageBackToNormal;
+    private String messageSuccess;
+    private String messageFailure;
+    private String messageAborted;
+    private String messageNotBuilt;
+    private String messageUnstable;
+
     @DataBoundConstructor
     public HipChatNotifier(String token, String room, boolean startNotification, boolean notifySuccess,
             boolean notifyAborted, boolean notifyNotBuilt, boolean notifyUnstable, boolean notifyFailure,
-            boolean notifyBackToNormal) {
+            boolean notifyBackToNormal,
+            String messageStarted, String messageBackToNormal, String messageSuccess, String messageFailure,
+            String messageAborted, String messageNotBuilt, String messageUnstable) {
         this.token = token;
         this.room = room;
         this.startNotification = startNotification;
@@ -55,7 +66,16 @@ public class HipChatNotifier extends Notifier {
         this.notifyUnstable = notifyUnstable;
         this.notifyFailure = notifyFailure;
         this.notifyBackToNormal = notifyBackToNormal;
+        this.messageStarted = messageStarted;
+        this.messageBackToNormal = messageBackToNormal;
+        this.messageSuccess = messageSuccess;
+        this.messageFailure = messageFailure;
+        this.messageAborted = messageAborted;
+        this.messageNotBuilt = messageNotBuilt;
+        this.messageUnstable = messageUnstable;
     }
+
+    /* notification enabled disabled setter/getter */
 
     public boolean isStartNotification() {
         return startNotification;
@@ -111,6 +131,70 @@ public class HipChatNotifier extends Notifier {
 
     public void setNotifyBackToNormal(boolean notifyBackToNormal) {
         this.notifyBackToNormal = notifyBackToNormal;
+    }
+
+    /* notification message configuration*/
+
+    public String getMessageStarted() {
+        return messageStarted;
+    }
+
+    public void setMessageStarted(String messageStarted) {
+        this.messageStarted = messageStarted;
+    }
+
+    public String getMessageBackToNormal() {
+        return messageBackToNormal;
+    }
+
+    public void setMessageBackToNormal(String messageBackToNormal) {
+        this.messageBackToNormal = messageBackToNormal;
+    }
+
+    public String getMessageSuccess() {
+        return messageSuccess;
+    }
+
+    public void setMessageSuccess(String messageSuccess) {
+        this.messageSuccess = messageSuccess;
+    }
+
+    public String getMessageFailure() {
+        return messageFailure;
+    }
+
+    public void setMessageFailure(String messageFailure) {
+        this.messageFailure = messageFailure;
+    }
+
+    public String getMessageAborted() {
+        return messageAborted;
+    }
+
+    public void setMessageAborted(String messageAborted) {
+        this.messageAborted = messageAborted;
+    }
+
+    public String getMessageNotBuilt() {
+        return messageNotBuilt;
+    }
+
+    public void setMessageNotBuilt(String messageNotBuilt) {
+        this.messageNotBuilt = messageNotBuilt;
+    }
+
+    public String getMessageUnstable() {
+        return messageUnstable;
+    }
+
+    public void setMessageUnstable(String messageUnstable) {
+        this.messageUnstable = messageUnstable;
+    }
+
+    public String getMessageDefault(String enumName) {
+        NotificationType type = NotificationType.valueOf(enumName);
+        Preconditions.checkNotNull(type, "unknown NotificationType %s", enumName);
+        return type.getDefaultTemplate();
     }
 
     public String getRoom() {
@@ -179,7 +263,7 @@ public class HipChatNotifier extends Notifier {
 
     private void publishNotificationIfEnabled(NotificationType notificationType, AbstractBuild<?, ?> build) {
         if (isNotificationEnabled(notificationType)) {
-            getHipChatService().publish(notificationType.getMessage(build), notificationType.getColor());
+            getHipChatService().publish(notificationType.getMessage(build, this), notificationType.getColor());
         }
     }
 

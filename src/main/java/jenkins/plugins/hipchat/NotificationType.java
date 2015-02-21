@@ -1,84 +1,119 @@
 package jenkins.plugins.hipchat;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import hudson.EnvVars;
 import hudson.model.AbstractBuild;
-import hudson.model.CauseAction;
 import hudson.model.Result;
 import hudson.scm.ChangeLogSet;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import jenkins.model.Jenkins;
+import hudson.util.LogTaskListener;
+import hudson.util.VariableResolver;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.collect.Maps.newHashMap;
+import static hudson.Util.replaceMacro;
+import static java.util.logging.Level.INFO;
 
 public enum NotificationType {
 
     STARTED("green") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageStarted();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    String changes = getStatusMessageWithChanges(build);
-                    if (changes != null) {
-                        return changes;
-                    } else {
-                        CauseAction cause = build.getAction(CauseAction.class);
-                        if (cause != null) {
-                            return cause.getShortDescription();
-                        } else {
-                            return Messages.Starting();
-                        }
-                    }
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.Started();
+        }
+    },
     ABORTED("gray") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageAborted();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    return Messages.Aborted(build.getDurationString());
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.Aborted();
+        }
+    },
     SUCCESS("green") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageSuccess();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    return Messages.Success(build.getDurationString());
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.Success();
+        }
+    },
     FAILURE("red") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageFailure();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    return Messages.Failure(build.getDurationString());
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.Failure();
+        }
+    },
     NOT_BUILT("gray") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageNotBuilt();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    return Messages.NotBuilt();
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.NotBuilt();
+        }
+    },
     BACK_TO_NORMAL("green") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageBackToNormal();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    return Messages.BackToNormal(build.getDurationString());
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.BackToNormal();
+        }
+    },
     UNSTABLE("yellow") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            return notifier.getMessageUnstable();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    return Messages.Unstable(build.getDurationString());
-                }
-            },
+        @Override
+        public String getDefaultTemplate() {
+            return Messages.Unstable();
+        }
+    },
     UNKNOWN("purple") {
+        @Override
+        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+            throw new IllegalStateException();
+        }
 
-                @Override
-                protected String getStatusMessage(AbstractBuild<?, ?> build) {
-                    throw new IllegalStateException("Unable to generate status message for UNKNOWN notification type");
-                }
-            };
+        @Override
+        public String getDefaultTemplate() {
+            return null;
+        }
+    };
+
     private static final Logger logger = Logger.getLogger(NotificationType.class.getName());
     private final String color;
 
@@ -86,50 +121,56 @@ public enum NotificationType {
         this.color = color;
     }
 
-    protected abstract String getStatusMessage(AbstractBuild<?, ?> build);
+    protected abstract String getConfiguredTemplateFor(HipChatNotifier notifier);
+    public abstract String getDefaultTemplate();
 
     public String getColor() {
         return color;
     }
 
-    private static String getStatusMessageWithChanges(AbstractBuild<?, ?> build) {
-        if (!build.hasChangeSetComputed()) {
-            logger.log(Level.FINE, "No changeset computed for job {0}", build.getProject().getFullDisplayName());
-            return null;
-        }
+    public final String getMessage(AbstractBuild<?, ?> build, HipChatNotifier notifier) {
+        String format = getTemplateFor(notifier);
+        Map<String, String> messageVariables = collectParametersFor(build);
 
-        Set<String> authors = new HashSet<String>();
-        int changedFiles = 0;
-        for (Object o : build.getChangeSet().getItems()) {
-            ChangeLogSet.Entry entry = (ChangeLogSet.Entry) o;
-            logger.log(Level.FINEST, "Entry {0}", entry);
-            authors.add(entry.getAuthor().getDisplayName());
-            try {
-                changedFiles += entry.getAffectedFiles().size();
-            } catch (UnsupportedOperationException e) {
-                logger.log(Level.INFO, "Unable to collect the affected files for job {0}",
-                        build.getProject().getFullDisplayName());
-                return null;
-            }
-        }
-        if (changedFiles == 0) {
-            logger.log(Level.FINE, "No changes detected");
-            return null;
-        }
-
-        return Messages.StartWithChanges(StringUtils.join(authors, ", "), changedFiles);
+        return replaceMacro(format, new VariableResolver.ByMap<String>(messageVariables));
     }
 
-    public final String getMessage(AbstractBuild<?, ?> build) {
-        String rootUrl = Jenkins.getInstance().getRootUrl();
-        StringBuilder sb = new StringBuilder(150);
-        sb.append(Messages.MessageStart(build.getProject().getFullDisplayName(), build.getDisplayName()));
-        sb.append(' ');
-        sb.append(getStatusMessage(build));
+    private String getTemplateFor(HipChatNotifier notifier) {
+        String userConfig = this.getConfiguredTemplateFor(notifier);
+        String defaultConfig = this.getDefaultTemplate();
+        if (userConfig == null || userConfig.trim().isEmpty()) {
+            Preconditions.checkState(defaultConfig != null, "default config not set for %s", this);
+            return defaultConfig;
+        } else {
+            return userConfig;
+        }
+    }
 
-        sb.append(" (<a href=\"").append(rootUrl).append(build.getUrl()).append("\">Open</a>)");
+    private Map<String, String> collectParametersFor(AbstractBuild build) {
+        Map<String, String> merged = newHashMap();
+        merged.putAll(build.getBuildVariables());
+        merged.putAll(getEnvVars(build));
 
-        return sb.toString();
+        String cause = NotificationTypeUtils.getCause(build);
+        String changes = NotificationTypeUtils.getChanges(build);
+
+        merged.put("DURATION", build.getDurationString());
+        merged.put("URL", NotificationTypeUtils.getUrl(build));
+        merged.put("CAUSE", cause);
+        merged.put("CHANGES_OR_CAUSE", changes != null ? changes : cause);
+        merged.put("CHANGES", changes);
+        merged.put("PRINT_FULL_ENV", merged.toString());
+        return merged;
+    }
+
+    private EnvVars getEnvVars(AbstractBuild build) {
+        try {
+            return build.getEnvironment(new LogTaskListener(logger, INFO));
+        } catch (IOException e) {
+            throw propagate(e);
+        } catch (InterruptedException e) {
+            throw propagate(e);
+        }
     }
 
     public static final NotificationType fromResults(Result previousResult, Result result) {
