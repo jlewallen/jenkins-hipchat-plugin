@@ -2,6 +2,7 @@ package jenkins.plugins.hipchat;
 
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
@@ -31,6 +32,7 @@ import static jenkins.plugins.hipchat.NotificationType.*;
 public class HipChatNotifier extends Notifier {
 
     private static final Logger logger = Logger.getLogger(HipChatNotifier.class.getName());
+    private String token;
     private String room;
     private boolean startNotification;
     private boolean notifySuccess;
@@ -41,8 +43,10 @@ public class HipChatNotifier extends Notifier {
     private boolean notifyBackToNormal;
 
     @DataBoundConstructor
-    public HipChatNotifier(String room, boolean startNotification, boolean notifySuccess, boolean notifyAborted,
-            boolean notifyNotBuilt, boolean notifyUnstable, boolean notifyFailure, boolean notifyBackToNormal) {
+    public HipChatNotifier(String token, String room, boolean startNotification, boolean notifySuccess,
+            boolean notifyAborted, boolean notifyNotBuilt, boolean notifyUnstable, boolean notifyFailure,
+            boolean notifyBackToNormal) {
+        this.token = token;
         this.room = room;
         this.startNotification = startNotification;
         this.notifySuccess = notifySuccess;
@@ -117,6 +121,14 @@ public class HipChatNotifier extends Notifier {
         this.room = room;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public DescriptorImpl getDescriptor() {
         return Jenkins.getInstance().getDescriptorByType(DescriptorImpl.class);
@@ -129,6 +141,7 @@ public class HipChatNotifier extends Notifier {
         return true;
     }
 
+    @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
@@ -193,7 +206,8 @@ public class HipChatNotifier extends Notifier {
 
     private HipChatService getHipChatService() {
         DescriptorImpl desc = getDescriptor();
-        return getHipChatService(desc.getServer(), desc.getToken(), desc.isV2Enabled(),
+        String authToken = Util.fixEmpty(token) != null ? token : desc.getToken();
+        return getHipChatService(desc.getServer(), authToken, desc.isV2Enabled(),
                 StringUtils.isBlank(room) ? desc.getRoom() : room, desc.getSendAs());
     }
 
