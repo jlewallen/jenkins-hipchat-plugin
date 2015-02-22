@@ -29,10 +29,6 @@ public class HipChatV2Service extends HipChatService {
         this.roomIds = roomIds == null ? DEFAULT_ROOMS : roomIds.split("\\s*,\\s*");
     }
 
-    public void publish(NotificationType notificationType, AbstractBuild<?, ?> build) {
-        publish(notificationType.getMessage(build), notificationType.getColor());
-    }
-
     public void publish(String message, String color) {
         publish(message, color, shouldNotify(color));
     }

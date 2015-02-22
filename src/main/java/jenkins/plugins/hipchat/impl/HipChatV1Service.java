@@ -28,11 +28,6 @@ public class HipChatV1Service extends HipChatService {
     }
 
     @Override
-    public void publish(NotificationType notificationType, AbstractBuild<?, ?> build) {
-        publish(notificationType.getMessage(build), notificationType.getColor());
-    }
-
-    @Override
     public void publish(String message, String color) {
         publish(message, color, shouldNotify(color));
     }

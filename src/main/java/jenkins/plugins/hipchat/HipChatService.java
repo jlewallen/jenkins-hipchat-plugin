@@ -28,8 +28,6 @@ public abstract class HipChatService {
         return client;
     }
 
-    public abstract void publish(NotificationType notificationType, AbstractBuild<?, ?> build);
-
     public abstract void publish(String message, String color);
 
     public abstract void publish(String message, String color, boolean notify);
