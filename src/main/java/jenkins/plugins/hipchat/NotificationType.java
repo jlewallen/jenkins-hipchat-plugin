@@ -123,7 +123,7 @@ public enum NotificationType {
     public final String getMessage(AbstractBuild<?, ?> build) {
         String rootUrl = Jenkins.getInstance().getRootUrl();
         StringBuilder sb = new StringBuilder(150);
-        sb.append(Messages.MessageStart(build.getProject().getDisplayName(), build.getDisplayName()));
+        sb.append(Messages.MessageStart(build.getProject().getFullDisplayName(), build.getDisplayName()));
         sb.append(' ');
         sb.append(getStatusMessage(build));
 
