@@ -2,6 +2,7 @@ package jenkins.plugins.hipchat;
 
 import hudson.model.AbstractBuild;
 import hudson.model.CauseAction;
+import hudson.model.Result;
 import hudson.scm.ChangeLogSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -129,5 +130,25 @@ public enum NotificationType {
         sb.append(" (<a href=\"").append(rootUrl).append(build.getUrl()).append("\">Open</a>)");
 
         return sb.toString();
+    }
+
+    public static final NotificationType fromResults(Result previousResult, Result result) {
+        if (result == Result.ABORTED) {
+            return ABORTED;
+        } else if (result == Result.FAILURE) {
+            return FAILURE;
+        } else if (result == Result.NOT_BUILT) {
+            return NOT_BUILT;
+        } else if (result == Result.UNSTABLE) {
+            return UNSTABLE;
+        } else if (result == Result.SUCCESS) {
+            if (previousResult == Result.FAILURE) {
+                return BACK_TO_NORMAL;
+            } else {
+                return SUCCESS;
+            }
+        }
+
+        return UNKNOWN;
     }
 }

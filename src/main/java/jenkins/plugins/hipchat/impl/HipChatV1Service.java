@@ -1,22 +1,18 @@
-package jenkins.plugins.hipchat;
+package jenkins.plugins.hipchat.impl;
 
-import hudson.ProxyConfiguration;
 import hudson.model.AbstractBuild;
-import jenkins.model.Jenkins;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jenkins.plugins.hipchat.HipChatService;
+import jenkins.plugins.hipchat.NotificationType;
 
-public class StandardHipChatService implements HipChatService {
+public class HipChatV1Service extends HipChatService {
 
-    /**
-     * HTTP Connection timeout when making calls to HipChat
-     */
-    public static final Integer DEFAULT_TIMEOUT = 10000;
-    private static final Logger logger = Logger.getLogger(StandardHipChatService.class.getName());
+    private static final Logger logger = Logger.getLogger(HipChatV1Service.class.getName());
     private static final String[] DEFAULT_ROOMS = new String[0];
 
     private final String server;
@@ -24,21 +20,24 @@ public class StandardHipChatService implements HipChatService {
     private final String[] roomIds;
     private final String sendAs;
 
-    public StandardHipChatService(String server, String token, String roomIds, String sendAs) {
+    public HipChatV1Service(String server, String token, String roomIds, String sendAs) {
         this.server = server;
         this.token = token;
         this.roomIds = roomIds == null ? DEFAULT_ROOMS : roomIds.split("\\s*,\\s*");
         this.sendAs = sendAs;
     }
 
+    @Override
     public void publish(NotificationType notificationType, AbstractBuild<?, ?> build) {
         publish(notificationType.getMessage(build), notificationType.getColor());
     }
 
+    @Override
     public void publish(String message, String color) {
         publish(message, color, shouldNotify(color));
     }
 
+    @Override
     public void publish(String message, String color, boolean notify) {
         for (String roomId : roomIds) {
             logger.log(Level.INFO, "Posting: {0} to {1}: {2} {3}", new Object[]{sendAs, roomId, message, color});
@@ -64,22 +63,6 @@ public class StandardHipChatService implements HipChatService {
                 post.releaseConnection();
             }
         }
-    }
-
-    private HttpClient getHttpClient() {
-        HttpClient client = new HttpClient();
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(DEFAULT_TIMEOUT);
-        client.getHttpConnectionManager().getParams().setSoTimeout(DEFAULT_TIMEOUT);
-
-        if (Jenkins.getInstance() != null) {
-            ProxyConfiguration proxy = Jenkins.getInstance().proxy;
-
-            if (proxy != null) {
-                client.getHostConfiguration().setProxy(proxy.name, proxy.port);
-            }
-        }
-
-        return client;
     }
 
     private boolean shouldNotify(String color) {

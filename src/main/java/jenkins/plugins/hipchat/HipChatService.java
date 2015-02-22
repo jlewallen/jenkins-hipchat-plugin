@@ -1,12 +1,36 @@
 package jenkins.plugins.hipchat;
 
+import hudson.ProxyConfiguration;
 import hudson.model.AbstractBuild;
+import jenkins.model.Jenkins;
+import org.apache.commons.httpclient.HttpClient;
 
-public interface HipChatService {
+public abstract class HipChatService {
 
-    void publish(NotificationType notificationType, AbstractBuild<?, ?> build);
+    /**
+     * HTTP Connection timeout when making calls to HipChat
+     */
+    public static final Integer DEFAULT_TIMEOUT = 10000;
 
-    void publish(String message, String color);
+    protected HttpClient getHttpClient() {
+        HttpClient client = new HttpClient();
+        client.getHttpConnectionManager().getParams().setConnectionTimeout(DEFAULT_TIMEOUT);
+        client.getHttpConnectionManager().getParams().setSoTimeout(DEFAULT_TIMEOUT);
 
-    void publish(String message, String color, boolean notify);
+        if (Jenkins.getInstance() != null) {
+            ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+
+            if (proxy != null) {
+                client.getHostConfiguration().setProxy(proxy.name, proxy.port);
+            }
+        }
+
+        return client;
+    }
+
+    public abstract void publish(NotificationType notificationType, AbstractBuild<?, ?> build);
+
+    public abstract void publish(String message, String color);
+
+    public abstract void publish(String message, String color, boolean notify);
 }
