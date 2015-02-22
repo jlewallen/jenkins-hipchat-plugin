@@ -42,10 +42,11 @@ public class HipChatV1Service extends HipChatService {
         for (String roomId : roomIds) {
             logger.log(Level.INFO, "Posting: {0} to {1}: {2} {3}", new Object[]{sendAs, roomId, message, color});
             HttpClient client = getHttpClient();
-            String url = "https://" + server + "/v1/rooms/message?auth_token=" + token;
+            String url = "https://" + server + "/v1/rooms/message";
             PostMethod post = new PostMethod(url);
 
             try {
+                post.addParameter("auth_token", token);
                 post.addParameter("from", sendAs);
                 post.addParameter("room_id", roomId);
                 post.addParameter("message", message);
