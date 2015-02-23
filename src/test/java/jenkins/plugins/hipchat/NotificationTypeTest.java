@@ -56,13 +56,11 @@ public class NotificationTypeTest {
         mockJenkins();
 
         HipChatNotifier notifier = notifier()
-                .setMessageFailure("you broke it $AUTHOR!")
+                .setMessageJobCompleted("i feel so $STATUS")
                 .createHipChatNotifier();
-        String url = "(<a href=\"http://localhost:8080/jenkins/foo/123\">Open</a>";
-        String prefix = "test-job #33";
-        assertNotifierProduces(build(), notifier, SUCCESS, prefix + " Success after 42 sec " + url + ")");
-        assertNotifierProduces(build(), notifier, FAILURE, "you broke it Mike!");
-        assertNotifierProduces(build(), notifier, NOT_BUILT, prefix + " Not built after 42 sec " + url + ")");
+        assertNotifierProduces(build(), notifier, SUCCESS, "i feel so Success");
+        assertNotifierProduces(build(), notifier, FAILURE, "i feel so <b>FAILURE</b>");
+        assertNotifierProduces(build(), notifier, NOT_BUILT, "i feel so Not built");
     }
 
     @Test
@@ -71,9 +69,8 @@ public class NotificationTypeTest {
         mockJenkins();
 
         HipChatNotifier notifier = notifier()
-                .setMessageFailure("")
-                .setMessageNotBuilt(" ")
-                .setMessageSuccess(null)
+                .setMessageJobCompleted("   ")
+                .setMessageJobStarted(null)
                 .createHipChatNotifier();
         testNormalConfiguration(build(), notifier);
     }
@@ -84,21 +81,16 @@ public class NotificationTypeTest {
         mockJenkins();
 
         HipChatNotifier notifier = notifier()
-                .setMessageStarting("MessageStarting")
-                .setMessageAborted("MessageAborted")
-                .setMessageSuccess("MessageSuccess")
-                .setMessageFailure("MessageFailure")
-                .setMessageNotBuilt("MessageNotBuilt")
-                .setMessageBackToNormal("MessageBackToNormal")
-                .setMessageUnstable("MessageUnstable")
+                .setMessageJobCompleted("completed")
+                .setMessageJobStarted("started")
                 .createHipChatNotifier();
-        assertNotifierProduces(build(), notifier, STARTED, "MessageStarting");
-        assertNotifierProduces(build(), notifier, ABORTED, "MessageAborted");
-        assertNotifierProduces(build(), notifier, SUCCESS, "MessageSuccess");
-        assertNotifierProduces(build(), notifier, FAILURE, "MessageFailure");
-        assertNotifierProduces(build(), notifier, NOT_BUILT, "MessageNotBuilt");
-        assertNotifierProduces(build(), notifier, BACK_TO_NORMAL, "MessageBackToNormal");
-        assertNotifierProduces(build(), notifier, UNSTABLE, "MessageUnstable");
+        assertNotifierProduces(build(), notifier, STARTED, "started");
+        assertNotifierProduces(build(), notifier, ABORTED, "completed");
+        assertNotifierProduces(build(), notifier, SUCCESS, "completed");
+        assertNotifierProduces(build(), notifier, FAILURE, "completed");
+        assertNotifierProduces(build(), notifier, NOT_BUILT, "completed");
+        assertNotifierProduces(build(), notifier, BACK_TO_NORMAL, "completed");
+        assertNotifierProduces(build(), notifier, UNSTABLE, "completed");
     }
 
     private void testNormalConfiguration(AbstractBuild<?, ?> build, HipChatNotifier notifier) {

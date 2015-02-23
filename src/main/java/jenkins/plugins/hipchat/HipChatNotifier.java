@@ -1,6 +1,5 @@
 package jenkins.plugins.hipchat;
 
-import com.google.common.base.Preconditions;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
@@ -15,8 +14,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
-import java.io.IOException;
-import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import jenkins.plugins.hipchat.impl.HipChatV1Service;
 import jenkins.plugins.hipchat.impl.HipChatV2Service;
@@ -27,7 +24,10 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 
-import static jenkins.plugins.hipchat.NotificationType.*;
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import static jenkins.plugins.hipchat.NotificationType.STARTED;
 
 @SuppressWarnings({"unchecked"})
 public class HipChatNotifier extends Notifier {
@@ -43,20 +43,14 @@ public class HipChatNotifier extends Notifier {
     private boolean notifyFailure;
     private boolean notifyBackToNormal;
 
-    private String messageStarted;
-    private String messageBackToNormal;
-    private String messageSuccess;
-    private String messageFailure;
-    private String messageAborted;
-    private String messageNotBuilt;
-    private String messageUnstable;
+    private String startJobMessage;
+    private String completeJobMessage;
 
     @DataBoundConstructor
     public HipChatNotifier(String token, String room, boolean startNotification, boolean notifySuccess,
             boolean notifyAborted, boolean notifyNotBuilt, boolean notifyUnstable, boolean notifyFailure,
             boolean notifyBackToNormal,
-            String messageStarted, String messageBackToNormal, String messageSuccess, String messageFailure,
-            String messageAborted, String messageNotBuilt, String messageUnstable) {
+            String startJobMessage, String completeJobMessage) {
         this.token = token;
         this.room = room;
         this.startNotification = startNotification;
@@ -66,13 +60,9 @@ public class HipChatNotifier extends Notifier {
         this.notifyUnstable = notifyUnstable;
         this.notifyFailure = notifyFailure;
         this.notifyBackToNormal = notifyBackToNormal;
-        this.messageStarted = messageStarted;
-        this.messageBackToNormal = messageBackToNormal;
-        this.messageSuccess = messageSuccess;
-        this.messageFailure = messageFailure;
-        this.messageAborted = messageAborted;
-        this.messageNotBuilt = messageNotBuilt;
-        this.messageUnstable = messageUnstable;
+
+        this.startJobMessage = startJobMessage;
+        this.completeJobMessage = completeJobMessage;
     }
 
     /* notification enabled disabled setter/getter */
@@ -135,66 +125,28 @@ public class HipChatNotifier extends Notifier {
 
     /* notification message configuration*/
 
-    public String getMessageStarted() {
-        return messageStarted;
+    public String getCompleteJobMessage() {
+        return completeJobMessage;
     }
 
-    public void setMessageStarted(String messageStarted) {
-        this.messageStarted = messageStarted;
+    public void setCompleteJobMessage(String completeJobMessage) {
+        this.completeJobMessage = completeJobMessage;
     }
 
-    public String getMessageBackToNormal() {
-        return messageBackToNormal;
+    public String getStartJobMessage() {
+        return startJobMessage;
     }
 
-    public void setMessageBackToNormal(String messageBackToNormal) {
-        this.messageBackToNormal = messageBackToNormal;
+    public void setStartJobMessage(String startJobMessage) {
+        this.startJobMessage = startJobMessage;
     }
 
-    public String getMessageSuccess() {
-        return messageSuccess;
+    public String getCompleteJobMessageDefault() {
+        return Messages.JobCompleted();
     }
 
-    public void setMessageSuccess(String messageSuccess) {
-        this.messageSuccess = messageSuccess;
-    }
-
-    public String getMessageFailure() {
-        return messageFailure;
-    }
-
-    public void setMessageFailure(String messageFailure) {
-        this.messageFailure = messageFailure;
-    }
-
-    public String getMessageAborted() {
-        return messageAborted;
-    }
-
-    public void setMessageAborted(String messageAborted) {
-        this.messageAborted = messageAborted;
-    }
-
-    public String getMessageNotBuilt() {
-        return messageNotBuilt;
-    }
-
-    public void setMessageNotBuilt(String messageNotBuilt) {
-        this.messageNotBuilt = messageNotBuilt;
-    }
-
-    public String getMessageUnstable() {
-        return messageUnstable;
-    }
-
-    public void setMessageUnstable(String messageUnstable) {
-        this.messageUnstable = messageUnstable;
-    }
-
-    public String getMessageDefault(String enumName) {
-        NotificationType type = NotificationType.valueOf(enumName);
-        Preconditions.checkNotNull(type, "unknown NotificationType %s", enumName);
-        return type.getDefaultTemplate();
+    public String getStartJobMessageDefault() {
+        return Messages.JobStarted();
     }
 
     public String getRoom() {

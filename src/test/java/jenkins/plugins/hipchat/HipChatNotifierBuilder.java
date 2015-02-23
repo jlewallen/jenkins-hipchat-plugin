@@ -10,13 +10,8 @@ public class HipChatNotifierBuilder {
     private boolean notifyUnstable = true;
     private boolean notifyFailure = true;
     private boolean notifyBackToNormal = true;
-    private String messageStarting;
-    private String messageBackToNormal;
-    private String messageSuccess;
-    private String messageFailure;
-    private String messageAborted;
-    private String messageNotBuilt;
-    private String messageUnstable;
+    private String messageJobStarted;
+    private String messageJobCompleted;
 
     public static HipChatNotifierBuilder notifier() {
         return new HipChatNotifierBuilder();
@@ -67,44 +62,18 @@ public class HipChatNotifierBuilder {
         return this;
     }
 
-    public HipChatNotifierBuilder setMessageStarting(String messageStarting) {
-        this.messageStarting = messageStarting;
-        return this;
-    }
-
-    public HipChatNotifierBuilder setMessageBackToNormal(String messageBackToNormal) {
-        this.messageBackToNormal = messageBackToNormal;
-        return this;
-    }
-
-    public HipChatNotifierBuilder setMessageSuccess(String messageSuccess) {
-        this.messageSuccess = messageSuccess;
-        return this;
-    }
-
-    public HipChatNotifierBuilder setMessageFailure(String messageFailure) {
-        this.messageFailure = messageFailure;
-        return this;
-    }
-
-    public HipChatNotifierBuilder setMessageAborted(String messageAborted) {
-        this.messageAborted = messageAborted;
-        return this;
-    }
-
-    public HipChatNotifierBuilder setMessageNotBuilt(String messageNotBuilt) {
-        this.messageNotBuilt = messageNotBuilt;
-        return this;
-    }
-
-    public HipChatNotifierBuilder setMessageUnstable(String messageUnstable) {
-        this.messageUnstable = messageUnstable;
-        return this;
-    }
-
     public HipChatNotifier createHipChatNotifier() {
         return new HipChatNotifier(token, room, startNotification, notifySuccess, notifyAborted, notifyNotBuilt,
-                notifyUnstable, notifyFailure, notifyBackToNormal, messageStarting, messageBackToNormal,
-                messageSuccess, messageFailure, messageAborted, messageNotBuilt, messageUnstable);
+                notifyUnstable, notifyFailure, notifyBackToNormal, messageJobStarted, messageJobCompleted);
+    }
+
+    public HipChatNotifierBuilder setMessageJobStarted(String messageJobStarted) {
+        this.messageJobStarted = messageJobStarted;
+        return this;
+    }
+
+    public HipChatNotifierBuilder setMessageJobCompleted(String messageJobCompleted) {
+        this.messageJobCompleted = messageJobCompleted;
+        return this;
     }
 }

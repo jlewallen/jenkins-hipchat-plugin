@@ -38,42 +38,15 @@
         </f:entry>
     </f:section>
 
-    <f:advanced>
-        <f:section title="${%Message Templates}">
-            <f:entry title="${%Started}" help="/plugin/hipchat/help-projectConfig-hipChatMessages.html">
-                <f:textbox name="hipchat.messageStarted" value="${instance.messageStarted}"/>
-                Default: '${instance.getMessageDefault("STARTED")}'
-            </f:entry>
+    <f:section title="${%Message Templates}">
+        <f:entry title="${%Job started}" help="/plugin/hipchat/help-projectConfig-hipChatMessages.html">
+            <f:textbox name="hipchat.startJobMessage" value="${instance.startJobMessage}"/>
+            Default: '${instance.getStartJobMessageDefault()}'
+        </f:entry>
 
-            <f:entry title="${%Back To Normal}">
-                <f:textbox name="hipchat.messageBackToNormal" value="${instance.messageBackToNormal}"/>
-                Default: '${instance.getMessageDefault("BACK_TO_NORMAL")}'
-            </f:entry>
-
-            <f:entry title="${%Success}">
-                <f:textbox name="hipchat.messageSuccess" value="${instance.messageSuccess}"/>
-                Default: '${instance.getMessageDefault("SUCCESS")}'
-            </f:entry>
-
-            <f:entry title="${%Failure}">
-                <f:textbox name="hipchat.messageFailure" value="${instance.messageFailure}"/>
-                Default: '${instance.getMessageDefault("FAILURE")}'
-            </f:entry>
-
-            <f:entry title="${%Aborted}">
-                <f:textbox name="hipchat.messageAborted" value="${instance.messageAborted}"/>
-                Default: '${instance.getMessageDefault("ABORTED")}'
-            </f:entry>
-
-            <f:entry title="${%Not Built}">
-                <f:textbox name="hipchat.messageNotBuilt" value="${instance.messageNotBuilt}"/>
-                Default: '${instance.getMessageDefault("NOT_BUILT")}'
-            </f:entry>
-
-            <f:entry title="${%Unstable}">
-                <f:textbox name="hipchat.messageUnstable" value="${instance.messageUnstable}"/>
-                Default: '${instance.getMessageDefault("UNSTABLE")}'
-            </f:entry>
-        </f:section>
-    </f:advanced>
+        <f:entry title="${%Job completed}">
+            <f:textbox name="hipchat.completeJobMessage" value="${instance.completeJobMessage}"/>
+            Default: '${instance.getCompleteJobMessageDefault()}'
+        </f:entry>
+    </f:section>
 </j:jelly>

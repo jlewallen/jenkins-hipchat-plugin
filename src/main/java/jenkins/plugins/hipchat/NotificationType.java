@@ -1,21 +1,14 @@
 package jenkins.plugins.hipchat;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
-import hudson.scm.ChangeLogSet;
 import hudson.util.LogTaskListener;
 import hudson.util.VariableResolver;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Throwables.propagate;
@@ -25,104 +18,69 @@ import static java.util.logging.Level.INFO;
 
 public enum NotificationType {
 
-    STARTED("green") {
+    STARTED("green", true) {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageStarted();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.Started();
         }
     },
     ABORTED("gray") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageAborted();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.Aborted();
         }
     },
     SUCCESS("green") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageSuccess();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.Success();
         }
     },
     FAILURE("red") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageFailure();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.Failure();
         }
     },
     NOT_BUILT("gray") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageNotBuilt();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.NotBuilt();
         }
     },
     BACK_TO_NORMAL("green") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageBackToNormal();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.BackToNormal();
         }
     },
     UNSTABLE("yellow") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
-            return notifier.getMessageUnstable();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
+        protected String getStatus() {
             return Messages.Unstable();
         }
     },
     UNKNOWN("purple") {
         @Override
-        protected String getConfiguredTemplateFor(HipChatNotifier notifier) {
+        protected String getStatus() {
             throw new IllegalStateException();
-        }
-
-        @Override
-        public String getDefaultTemplate() {
-            return null;
         }
     };
 
     private static final Logger logger = Logger.getLogger(NotificationType.class.getName());
     private final String color;
+    private final boolean isStartType;
 
-    private NotificationType(String color) {
+    private NotificationType(String color, boolean isStartType) {
         this.color = color;
+        this.isStartType = isStartType;
     }
 
-    protected abstract String getConfiguredTemplateFor(HipChatNotifier notifier);
-    public abstract String getDefaultTemplate();
+    private NotificationType(String color) {
+        this(color, false);
+    }
+
+    protected abstract String getStatus();
 
     public String getColor() {
         return color;
@@ -136,8 +94,15 @@ public enum NotificationType {
     }
 
     private String getTemplateFor(HipChatNotifier notifier) {
-        String userConfig = this.getConfiguredTemplateFor(notifier);
-        String defaultConfig = this.getDefaultTemplate();
+        String userConfig, defaultConfig;
+        if (this.isStartType) {
+            userConfig = notifier.getStartJobMessage();
+            defaultConfig = Messages.JobStarted();
+        } else {
+            userConfig = notifier.getCompleteJobMessage();
+            defaultConfig = Messages.JobCompleted();
+        }
+
         if (userConfig == null || userConfig.trim().isEmpty()) {
             Preconditions.checkState(defaultConfig != null, "default config not set for %s", this);
             return defaultConfig;
@@ -154,6 +119,7 @@ public enum NotificationType {
         String cause = NotificationTypeUtils.getCause(build);
         String changes = NotificationTypeUtils.getChanges(build);
 
+        merged.put("STATUS", this.getStatus());
         merged.put("DURATION", build.getDurationString());
         merged.put("URL", NotificationTypeUtils.getUrl(build));
         merged.put("CAUSE", cause);
