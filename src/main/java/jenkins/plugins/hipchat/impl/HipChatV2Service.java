@@ -8,9 +8,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.plugins.hipchat.HipChatService;
 import jenkins.plugins.hipchat.NotificationType;
+import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 public class HipChatV2Service extends HipChatService {
 
@@ -46,9 +48,12 @@ public class HipChatV2Service extends HipChatService {
                 post = new PostMethod(url);
                 post.getParams().setContentCharset("UTF-8");
                 post.addRequestHeader("Authorization", "Bearer " + token);
-                post.addParameter("message", message);
-                post.addParameter("color", color);
-                post.addParameter("notify", Boolean.toString(notify));
+
+                JSONObject notification = new JSONObject();
+                notification.put("message", message);
+                notification.put("color", color);
+                notification.put("notify", notify);
+                post.setRequestEntity(new StringRequestEntity(notification.toString(), "application/json", "UTF-8"));
                 int responseCode = client.executeMethod(post);
                 if (responseCode != HttpStatus.SC_NO_CONTENT) {
                     if (logger.isLoggable(Level.WARNING)) {
