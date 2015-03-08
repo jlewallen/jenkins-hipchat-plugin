@@ -22,6 +22,7 @@ public class ConfigurationMigrator extends ItemListener {
                 HipChatNotifier notifier = item.getPublishersList().get(HipChatNotifier.class);
                 if (notifier != null) {
                     notifier.setRoom(property.getRoom());
+                    notifier.setStartNotification(property.getStartNotification());
                     notifier.setNotifyAborted(property.getNotifyAborted());
                     notifier.setNotifyBackToNormal(property.getNotifyBackToNormal());
                     notifier.setNotifyFailure(property.getNotifyFailure());
@@ -31,6 +32,8 @@ public class ConfigurationMigrator extends ItemListener {
                 }
                 try {
                     item.removeProperty(HipChatJobProperty.class);
+                    LOGGER.log(Level.INFO, "Successfully migrated project configuration for build job: {0}",
+                            item.getFullDisplayName());
                 } catch (IOException ioe) {
                     LOGGER.log(Level.WARNING, "An error occurred while trying to update job configuration for "
                             + item.getName(), ioe);
