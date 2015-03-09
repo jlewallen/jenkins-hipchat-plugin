@@ -30,12 +30,12 @@
         </license>
     </licenses>
 
-    <distributionManagement>
-        <repository>
-            <id>maven.jenkins-ci.org</id>
-            <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
+    <developers>
+        <developer>
+            <id>aldaris</id>
+            <name>Peter Major</name>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:ssh://github.com/jenkinsci/hipchat-plugin.git</connection>
