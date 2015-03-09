@@ -1,6 +1,5 @@
 package jenkins.plugins.hipchat.impl;
 
-import hudson.model.AbstractBuild;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -8,7 +7,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.plugins.hipchat.HipChatService;
-import jenkins.plugins.hipchat.NotificationType;
 
 public class HipChatV1Service extends HipChatService {
 

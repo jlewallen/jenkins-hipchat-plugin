@@ -1,13 +1,11 @@
 package jenkins.plugins.hipchat.impl;
 
-import hudson.model.AbstractBuild;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.plugins.hipchat.HipChatService;
-import jenkins.plugins.hipchat.NotificationType;
 import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;

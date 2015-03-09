@@ -13,7 +13,7 @@ public class HipChatNotifierBuilder {
     private String messageJobStarted;
     private String messageJobCompleted;
 
-    public static HipChatNotifierBuilder notifier() {
+    public static HipChatNotifierBuilder builder() {
         return new HipChatNotifierBuilder();
     }
 
@@ -62,7 +62,7 @@ public class HipChatNotifierBuilder {
         return this;
     }
 
-    public HipChatNotifier createHipChatNotifier() {
+    public HipChatNotifier build() {
         return new HipChatNotifier(token, room, startNotification, notifySuccess, notifyAborted, notifyNotBuilt,
                 notifyUnstable, notifyFailure, notifyBackToNormal, messageJobStarted, messageJobCompleted);
     }

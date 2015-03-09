@@ -25,13 +25,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import static jenkins.plugins.hipchat.HipChatNotifierBuilder.notifier;
+import static jenkins.plugins.hipchat.HipChatNotifierBuilder.builder;
 import static jenkins.plugins.hipchat.NotificationType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(Jenkins.class)
 public class NotificationTypeTest {
     @Mock
     Jenkins jenkins;
@@ -42,48 +43,44 @@ public class NotificationTypeTest {
     }
 
     @Test
-    @PrepareForTest(Jenkins.class)
     public void testGetMessage() throws Exception {
         mockJenkins();
-        HipChatNotifier notifier = notifier().createHipChatNotifier();
+        HipChatNotifier notifier = builder().build();
 
         testNormalConfiguration(build(), notifier);
     }
 
     @Test
-    @PrepareForTest(Jenkins.class)
     public void testGetMessageWithConfig() throws Exception {
         mockJenkins();
 
-        HipChatNotifier notifier = notifier()
+        HipChatNotifier notifier = builder()
                 .setMessageJobCompleted("i feel so $STATUS")
-                .createHipChatNotifier();
+                .build();
         assertNotifierProduces(build(), notifier, SUCCESS, "i feel so Success");
         assertNotifierProduces(build(), notifier, FAILURE, "i feel so <b>FAILURE</b>");
         assertNotifierProduces(build(), notifier, NOT_BUILT, "i feel so Not built");
     }
 
     @Test
-    @PrepareForTest(Jenkins.class)
     public void testGetMessageBlankConfiguration() throws Exception {
         mockJenkins();
 
-        HipChatNotifier notifier = notifier()
+        HipChatNotifier notifier = builder()
                 .setMessageJobCompleted("   ")
                 .setMessageJobStarted(null)
-                .createHipChatNotifier();
+                .build();
         testNormalConfiguration(build(), notifier);
     }
 
     @Test
-    @PrepareForTest(Jenkins.class)
     public void testGetMessageAllOverride() throws Exception {
         mockJenkins();
 
-        HipChatNotifier notifier = notifier()
+        HipChatNotifier notifier = builder()
                 .setMessageJobCompleted("completed")
                 .setMessageJobStarted("started")
-                .createHipChatNotifier();
+                .build();
         assertNotifierProduces(build(), notifier, STARTED, "started");
         assertNotifierProduces(build(), notifier, ABORTED, "completed");
         assertNotifierProduces(build(), notifier, SUCCESS, "completed");
@@ -96,7 +93,8 @@ public class NotificationTypeTest {
     private void testNormalConfiguration(AbstractBuild<?, ?> build, HipChatNotifier notifier) {
         String url = "(<a href=\"http://localhost:8080/jenkins/foo/123\">Open</a>";
         String prefix = "test-job #33";
-        assertNotifierProduces(build, notifier, STARTED, prefix + " Starting... (Started by changes from john.doe@example.com (1 file(s) changed)) " + url + ")");
+        assertNotifierProduces(build, notifier, STARTED,prefix
+                + " Starting... (Started by changes from john.doe@example.com (1 file(s) changed)) " + url + ")");
         assertNotifierProduces(build, notifier, ABORTED, prefix + " ABORTED after 42 sec " + url + ")");
         assertNotifierProduces(build, notifier, SUCCESS, prefix + " Success after 42 sec " + url + ")");
         assertNotifierProduces(build, notifier, FAILURE, prefix + " <b>FAILURE</b> after 42 sec " + url + ")");
@@ -119,7 +117,8 @@ public class NotificationTypeTest {
         return build;
     }
 
-    private void assertNotifierProduces(AbstractBuild<?, ?> build, HipChatNotifier notifier, NotificationType type, String expected) {
+    private void assertNotifierProduces(AbstractBuild<?, ?> build, HipChatNotifier notifier, NotificationType type,
+            String expected) {
         String msg = type.getMessage(build, notifier);
         assertThat(msg, equalTo(expected));
     }

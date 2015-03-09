@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
+import hudson.Util;
 import hudson.util.LogTaskListener;
 import hudson.util.VariableResolver;
 
@@ -67,7 +68,7 @@ public enum NotificationType {
         }
     };
 
-    private static final Logger logger = Logger.getLogger(NotificationType.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NotificationType.class.getName());
     private final String color;
     private final boolean isStartType;
 
@@ -94,8 +95,9 @@ public enum NotificationType {
     }
 
     private String getTemplateFor(HipChatNotifier notifier) {
-        String userConfig, defaultConfig;
-        if (this.isStartType) {
+        String userConfig;
+        String defaultConfig;
+        if (isStartType) {
             userConfig = notifier.getStartJobMessage();
             defaultConfig = Messages.JobStarted();
         } else {
@@ -103,15 +105,15 @@ public enum NotificationType {
             defaultConfig = Messages.JobCompleted();
         }
 
-        if (userConfig == null || userConfig.trim().isEmpty()) {
-            Preconditions.checkState(defaultConfig != null, "default config not set for %s", this);
+        if (Util.fixEmptyAndTrim(userConfig) == null) {
+            Preconditions.checkNotNull(defaultConfig, "Default template not set for %s", this);
             return defaultConfig;
         } else {
             return userConfig;
         }
     }
 
-    private Map<String, String> collectParametersFor(AbstractBuild build) {
+    private Map<String, String> collectParametersFor(AbstractBuild<?, ?> build) {
         Map<String, String> merged = newHashMap();
         merged.putAll(build.getBuildVariables());
         merged.putAll(getEnvVars(build));
@@ -119,7 +121,7 @@ public enum NotificationType {
         String cause = NotificationTypeUtils.getCause(build);
         String changes = NotificationTypeUtils.getChanges(build);
 
-        merged.put("STATUS", this.getStatus());
+        merged.put("STATUS", getStatus());
         merged.put("DURATION", build.getDurationString());
         merged.put("URL", NotificationTypeUtils.getUrl(build));
         merged.put("CAUSE", cause);
@@ -129,9 +131,9 @@ public enum NotificationType {
         return merged;
     }
 
-    private EnvVars getEnvVars(AbstractBuild build) {
+    private EnvVars getEnvVars(AbstractBuild<?, ?> build) {
         try {
-            return build.getEnvironment(new LogTaskListener(logger, INFO));
+            return build.getEnvironment(new LogTaskListener(LOGGER, INFO));
         } catch (IOException e) {
             throw propagate(e);
         } catch (InterruptedException e) {

@@ -65,7 +65,7 @@ public class HipChatNotifier extends Notifier {
         this.completeJobMessage = completeJobMessage;
     }
 
-    /* notification enabled disabled setter/getter */
+    /* notification enabled disabled setters/getters */
 
     public boolean isStartNotification() {
         return startNotification;
@@ -123,15 +123,7 @@ public class HipChatNotifier extends Notifier {
         this.notifyBackToNormal = notifyBackToNormal;
     }
 
-    /* notification message configuration*/
-
-    public String getCompleteJobMessage() {
-        return completeJobMessage;
-    }
-
-    public void setCompleteJobMessage(String completeJobMessage) {
-        this.completeJobMessage = completeJobMessage;
-    }
+    /* notification message configurations */
 
     public String getStartJobMessage() {
         return startJobMessage;
@@ -141,12 +133,23 @@ public class HipChatNotifier extends Notifier {
         this.startJobMessage = startJobMessage;
     }
 
-    public String getCompleteJobMessageDefault() {
-        return Messages.JobCompleted();
+
+    public String getCompleteJobMessage() {
+        return completeJobMessage;
     }
+
+    public void setCompleteJobMessage(String completeJobMessage) {
+        this.completeJobMessage = completeJobMessage;
+    }
+
+    /* Default notification messages for UI */
 
     public String getStartJobMessageDefault() {
         return Messages.JobStarted();
+    }
+
+    public String getCompleteJobMessageDefault() {
+        return Messages.JobCompleted();
     }
 
     public String getRoom() {

@@ -44,7 +44,7 @@
             Default: '${instance.getStartJobMessageDefault()}'
         </f:entry>
 
-        <f:entry title="${%Job completed}">
+        <f:entry title="${%Job completed}" help="/plugin/hipchat/help-projectConfig-hipChatMessages.html">
             <f:textbox name="hipchat.completeJobMessage" value="${instance.completeJobMessage}"/>
             Default: '${instance.getCompleteJobMessageDefault()}'
         </f:entry>
