@@ -3,7 +3,7 @@
         <f:entry title="${%HipChat Server}" help="/plugin/hipchat/help-globalConfig-hipChatServer.html">
             <f:textbox name="hipchat.server" default="api.hipchat.com" value="${descriptor.server}" />
         </f:entry>
-        <f:entry title="${%Use v2 API}" help="/plugin/hipchat/help-globalConfig-hipChatServer.html">
+        <f:entry title="${%Use v2 API}" help="/plugin/hipchat/help-globalConfig-hipChatv2Enabled.html">
             <f:checkbox name="hipchat.v2Enabled" checked="${descriptor.v2Enabled}"/>
         </f:entry>
         <f:entry title="${%API Token}" help="/plugin/hipchat/help-globalConfig-hipChatToken.html">
