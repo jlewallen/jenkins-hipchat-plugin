@@ -1,0 +1,19 @@
+<div>
+    <p>
+        Configures the message that will be displayed in the room. If left blank a default value will be used.
+        All normal build variables can be used with the notation <em>$VAR_NAME</em>. Additionally the following
+        variables are provided:
+    </p>
+    <ul>
+        <li><strong>$DURATION</strong> - duration of the build in human readable form. Example: 13 min</li>
+        <li><strong>$URL</strong> - URL to the job page on jenkins. You can use normal HTML to create a link
+            i.e: &lt;a href="$URL"&gt;More Info&lt;/a&gt; </li>
+        <li><strong>$CAUSE</strong> - cause of this change. Example: 'Started by user foo'</li>
+        <li><strong>$CHANGES</strong> - a short overview of the changes that caused that job, if available</li>
+        <li><strong>$CHANGES_OR_CAUSE</strong> - either $CHANGES or $CAUSE, see above</li>
+        <li><strong>$STATUS</strong> - the status of the build. Example: 'Success'</li>
+        <li><strong>$PRINT_FULL_ENV</strong> - dump of all variables, use this only for debugging purposes.
+            Be aware that it also contains the full host environment which might contain sensitive information.
+        </li>
+    </ul>
+</div>

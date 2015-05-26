@@ -1,0 +1,52 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <f:entry title="${%Auth Token}" help="/plugin/hipchat/help-projectConfig-token.html">
+        <f:textbox name="hipchat.token" value="${instance.token}" />
+    </f:entry>
+    <f:entry title="${%Project Room}" help="/plugin/hipchat/help-projectConfig-hipChatRoom.html">
+        <f:textbox name="hipchat.room" value="${instance.room}" />
+    </f:entry>
+
+    <f:section title="${%Notification settings}">
+        <f:entry title="${%Notify Build Start}">
+            <f:checkbox name="hipchat.startNotification" checked="${instance.startNotification}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Aborted}">
+            <f:checkbox name="hipchat.notifyAborted" checked="${instance.notifyAborted}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Failure}">
+            <f:checkbox name="hipchat.notifyFailure" checked="${instance.notifyFailure}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Not Built}">
+            <f:checkbox name="hipchat.notifyNotBuilt" checked="${instance.notifyNotBuilt}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Success}">
+            <f:checkbox name="hipchat.notifySuccess" checked="${instance.notifySuccess}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Unstable}">
+            <f:checkbox name="hipchat.notifyUnstable" checked="${instance.notifyUnstable}" />
+        </f:entry>
+
+        <f:entry title="${%Notify Back To Normal}">
+            <f:checkbox name="hipchat.notifyBackToNormal" checked="${instance.notifyBackToNormal}" />
+        </f:entry>
+    </f:section>
+
+    <f:section title="${%Message Templates}">
+        <f:entry title="${%Job started}" help="/plugin/hipchat/help-projectConfig-hipChatMessages.html">
+            <f:textbox name="hipchat.startJobMessage" value="${instance.startJobMessage}"/>
+            Default: '${instance.getStartJobMessageDefault()}'
+        </f:entry>
+
+        <f:entry title="${%Job completed}" help="/plugin/hipchat/help-projectConfig-hipChatMessages.html">
+            <f:textbox name="hipchat.completeJobMessage" value="${instance.completeJobMessage}"/>
+            Default: '${instance.getCompleteJobMessageDefault()}'
+        </f:entry>
+    </f:section>
+</j:jelly>
