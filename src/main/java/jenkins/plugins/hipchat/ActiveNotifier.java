@@ -165,9 +165,16 @@ public class ActiveNotifier implements FineGrainedNotifier {
         }
 
         private MessageBuilder startMessage() {
+            EnvVars envVars = new EnvVars();
+            envVars = build.getEnvironment();
+            String hipchatMsg = envVars.get("HIPCHAT_MSG");
             message.append(build.getProject().getDisplayName());
             message.append(" - ");
             message.append(build.getDisplayName());
+            if (hipchatMsg) {
+                message.append(" - ");
+                message.append(hipchatMsg);
+            }
             message.append(" ");
             return this;
         }
